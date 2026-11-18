@@ -1,6 +1,6 @@
 """
 Tests unitarios del pipeline de leads.
-Generados con ayuda de Claude Code — AI-Driven DevOps Accelerator, Semana 2.
+Generados con ayuda de Claude Code — AI-Driven DevOps Accelerator (SoftServe, nov 2026).
 Correr con: python -m pytest pipeline/tests/ -v
 """
 

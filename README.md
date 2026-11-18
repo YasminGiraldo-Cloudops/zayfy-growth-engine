@@ -3,8 +3,9 @@
 Proyecto integrador del programa **AI-Driven DevOps Accelerator** (SoftServe, sept–nov 2026).
 
 **Participante:** Yasmín Giraldo — Co-fundadora Zayfy · DevOps & Cloud (AWS)  
-**Ruta:** B — Problema propio  
-**Curso:** Modern DevOps, Built With AI
+**Ruta:** B — Problema propio
+
+![CI](https://github.com/YasminGiraldo-Cloudops/zayfy-growth-engine/actions/workflows/pipeline-demo.yml/badge.svg)
 
 ---
 
@@ -20,14 +21,18 @@ Herramienta web que genera posts listos para publicar en Instagram, TikTok y Lin
 - **Archivo:** [`content-studio.html`](content-studio.html)
 - **Resultado:** De 30 min a 2 min por post. Sin costo de API (templates locales).
 
-### Fase 2 — Pipeline n8n de leads (dic 2026)
+### Fase 2 — Pipeline Python + CI/CD ✅ (nov 2026)
+Pipeline ejecutable en Python que califica leads con Claude Haiku (patrón ReAct) y genera mensajes de outreach personalizados con Claude Sonnet. CI/CD con GitHub Actions: 2 jobs (demo + real), 6 tests unitarios con pytest.
+
+- **Pipeline:** [`pipeline/lead_pipeline.py`](pipeline/lead_pipeline.py)
+- **Tests:** [`pipeline/tests/test_pipeline.py`](pipeline/tests/test_pipeline.py)
+- **CI:** `.github/workflows/pipeline-demo.yml` — ✅ verde
+
+### Fase 3 — Pipeline n8n completo (dic 2026)
 Pipeline automatizado que monitorea hashtags en IG/TikTok, califica leads con Claude API y genera mensajes de outreach personalizados, con aprobación humana antes de enviar.
 
-- **Arquitectura:** [`pipeline/architecture.md`](pipeline/architecture.md)
+- **Arquitectura diseñada:** [`pipeline/architecture.md`](pipeline/architecture.md)
 - **Prompts:** [`pipeline/prompts/`](pipeline/prompts/)
-
-### Fase 3 — Publicación semi-automática (ene 2027)
-n8n genera según calendario editorial → humano aprueba → Buffer publica.
 
 ---
 
@@ -36,19 +41,20 @@ n8n genera según calendario editorial → humano aprueba → Buffer publica.
 | Herramienta | Uso |
 |---|---|
 | Claude Code (Sonnet) | Harness de desarrollo |
+| Python + pytest | Pipeline de leads + tests unitarios |
+| GitHub Actions | CI/CD (demo + real) |
 | Claude API (Haiku) | Calificación de leads |
 | Claude API (Sonnet) | Generación de outreach y contenido |
-| n8n | Orquestación del pipeline |
-| Apify | Scraping de hashtags IG/TikTok |
-| Buffer / Later | Publicación programada |
+| n8n | Orquestación del pipeline (Fase 3) |
+| Apify | Scraping de hashtags IG/TikTok (Fase 3) |
+| Buffer / Later | Publicación programada (Fase 3) |
 | AWS (ECS, RDS, CloudFront) | Infraestructura |
-| GitHub Actions | CI/CD |
 
 ---
 
-## Bitácora del curso
+## Bitácora del programa
 
-[`bitacora-devops-zayfy.html`](bitacora-devops-zayfy.html) — Semanas 1–8 + Consolidado con evidencia del proceso.
+[`bitacora-devops-zayfy.html`](bitacora-devops-zayfy.html) — 8 módulos + Consolidado con evidencia del proceso.
 
 ---
 

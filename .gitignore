@@ -2,3 +2,6 @@ pipeline_results.json
 __pycache__/
 *.pyc
 .env
+.pytest_cache/
+bitacora-devops-zayfy.pdf
+evidencia-proyecto-zayfy.pdf

@@ -490,10 +490,10 @@ table tr:hover td { background: var(--bg-2); }
 
 <span class="field-label">¿Usaste IA para analizar logs, métricas o trazas, detectar anomalías, o correlacionar eventos de tu proyecto esta semana?</span>
 
-<blockquote><p>El pipeline de n8n está diseñado pero aún no está en producción, así que no tengo datos de telemetría propios del Growth Engine todavía. Sin embargo, apliqué los conceptos del módulo para diseñar la estrategia de observabilidad desde el inicio.</p></blockquote>
+<div class="field-answer">El <strong>pipeline Python de calificación de leads</strong> sí está en producción: corre en GitHub Actions en cada push a <code>main</code>, genera <code>pipeline_results.json</code> como log de negocio y los logs del CI son la capa de monitoreo operacional. Para el pipeline completo con n8n (Fase 2), diseñé la estrategia de observabilidad antes de implementarlo.</div>
 
 <span class="field-label">Contexto que le diste a la IA</span>
-<div class="field-answer">Le pregunté: dado un pipeline de n8n con 4 fases (monitoreo → calificación IA → generación outreach → publicación), ¿qué métricas, logs y alertas debo diseñar desde el inicio para saber si está funcionando y dónde se rompe?</div>
+<div class="field-answer">Le pregunté: dado un pipeline con 4 fases (monitoreo → calificación IA → generación outreach → publicación), ¿qué métricas, logs y alertas debo diseñar desde el inicio para saber si está funcionando y dónde se rompe? También usé los logs del CI de GitHub Actions como ejemplo real de observabilidad operacional.</div>
 
 <span class="field-label">Problema o pregunta que trabajaste</span>
 <div class="field-answer">¿Cómo observo un pipeline que mezcla scraping (Apify), IA (Claude API) y publicación (Buffer)? Los tres tienen diferentes tipos de fallo: Apify puede no encontrar resultados, la IA puede devolver JSON malformado, y Buffer puede rechazar un post. ¿Cómo los distingo y alerto sobre cada uno sin perder ningún error?</div>
@@ -512,15 +512,20 @@ table tr:hover td { background: var(--bg-2); }
 
 <span class="field-label">Habilidades practicadas esta semana</span>
 <div class="checkboxes">
-  <div class="checkbox-item"><div class="cb"></div> Contexto estructurado a la IA</div>
+  <div class="checkbox-item checked-item"><div class="cb checked">✓</div> Contexto estructurado a la IA</div>
   <div class="checkbox-item checked-item"><div class="cb checked">✓</div> Investigación antes de solución</div>
-  <div class="checkbox-item"><div class="cb"></div> Validación de comandos/config</div>
+  <div class="checkbox-item checked-item"><div class="cb checked">✓</div> Validación de comandos/config</div>
   <div class="checkbox-item"><div class="cb"></div> Protección de información sensible</div>
 </div>
 
 <div class="leccion">
   <div class="leccion-label">Lección aprendida</div>
-  <p>No solo crear un agente — diseñar cómo observarlo desde el día 1. Un pipeline sin métricas es un proceso ciego: no sabes si funciona hasta que un cliente se queja.</p>
+  <p>No solo crear un agente — diseñar cómo observarlo desde el día 1. Un pipeline sin métricas es un proceso ciego: no sabes si funciona hasta que un cliente se queja. El CI de GitHub Actions fue la primera capa de observabilidad real: si el job falla, el pipeline no llega a main.</p>
+</div>
+
+<div class="evidence">
+  <div class="evidence-title">Evidencia</div>
+  <p><strong>Observabilidad operacional:</strong> logs del CI en GitHub Actions (<a href="https://github.com/YasminGiraldo-Cloudops/zayfy-growth-engine/actions" target="_blank">github.com/…/actions</a>) — cada run muestra duración, errores y output del pipeline. <strong>Log de negocio:</strong> <code>pipeline/pipeline_results.json</code> — resultado estructurado de cada ejecución con scores, señales y DMs generados.</p>
 </div>
 
 <hr>
@@ -599,14 +604,15 @@ table tr:hover td { background: var(--bg-2); }
 <span class="field-label">Qué acertó / qué falló la IA</span>
 <div class="field-answer">
   <strong>Acertó:</strong> identificar que el riesgo más alto no es técnico (exponer una API key) sino reputacional (que Zayfy sea percibida como spam). Un mensaje mal dirigido daña más que un token robado en este contexto. También acertó en recomendar que los tokens se guarden en variables de entorno de n8n, nunca en variables de texto en los nodos del workflow.<br><br>
-  <strong>Medidas aplicadas al Content Studio:</strong> el tool usa <code>localStorage</code> del browser — los leads se guardan localmente, nunca se envían a un servidor. Ningún dato de cliente pasa por APIs externas en la Fase 1.
+  <strong>Medidas aplicadas al Content Studio:</strong> el tool usa <code>localStorage</code> del browser — los leads se guardan localmente, nunca se envían a un servidor. Ningún dato de cliente pasa por APIs externas en la Fase 1.<br><br>
+  <strong>Medida aplicada al pipeline Python:</strong> la clave <code>ANTHROPIC_API_KEY</code> se almacena como GitHub Secret en el repositorio — nunca en el código fuente ni en texto plano. El workflow de CI la lee con <code>${{ secrets.ANTHROPIC_API_KEY }}</code> sin exponerla en los logs. Esto implementa el principio de mínimo privilegio del módulo: el script solo recibe la credencial cuando la necesita (job de producción en main), no en el job de demo ni en PRs.
 </div>
 
 <span class="field-label">Habilidades practicadas esta semana</span>
 <div class="checkboxes">
-  <div class="checkbox-item"><div class="cb"></div> Contexto estructurado a la IA</div>
-  <div class="checkbox-item"><div class="cb"></div> Investigación antes de solución</div>
-  <div class="checkbox-item"><div class="cb"></div> Validación de comandos/config</div>
+  <div class="checkbox-item checked-item"><div class="cb checked">✓</div> Contexto estructurado a la IA</div>
+  <div class="checkbox-item checked-item"><div class="cb checked">✓</div> Investigación antes de solución</div>
+  <div class="checkbox-item checked-item"><div class="cb checked">✓</div> Validación de comandos/config</div>
   <div class="checkbox-item checked-item"><div class="cb checked">✓</div> Protección de información sensible</div>
 </div>
 
@@ -634,6 +640,11 @@ table tr:hover td { background: var(--bg-2); }
     <tr>
       <td>Zayfy Content Studio</td>
       <td>Herramienta web con generador de posts para IG/TikTok/LinkedIn, banco de ideas, hashtags y mini-CRM de leads. Publicada como Artifact interactivo el 18 nov 2026.</td>
+      <td>✅ Hecho</td>
+    </tr>
+    <tr>
+      <td>Pipeline Python + CI/CD</td>
+      <td>Script <code>lead_pipeline.py</code> con calificación (Claude Haiku, patrón ReAct) y generación de DM (Claude Sonnet). 6 tests unitarios con pytest. Workflow de GitHub Actions con dos jobs (demo siempre + real solo en main con secret). CI en verde desde nov 2026. Repositorio: <a href="https://github.com/YasminGiraldo-Cloudops/zayfy-growth-engine" target="_blank">YasminGiraldo-Cloudops/zayfy-growth-engine</a></td>
       <td>✅ Hecho</td>
     </tr>
     <tr>

@@ -1,6 +1,6 @@
 """
 Zayfy Growth Engine — Pipeline de leads con Claude API
-Semana 4-5 del AI-Driven DevOps Accelerator (SoftServe)
+AI-Driven DevOps Accelerator (SoftServe, nov 2026)
 
 Demuestra:
 - Uso de Claude Haiku para calificación (tarea simple, costo bajo)
