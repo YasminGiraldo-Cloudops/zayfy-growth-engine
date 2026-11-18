@@ -313,12 +313,12 @@ table tr:hover td { background: var(--bg-2); }
 <div class="field-answer">Claude Code como harness: le di el contexto completo de Zayfy (el skill <code>zayfy-negocio</code> cargado en el sistema), los requisitos de la herramienta y las restricciones de marca. La IA generó el HTML/CSS/JS completo con más de 20 templates de posts, el banco de ideas y los hashtags curados. Revisé y ajusté los posts para verificar que la voz fuera correcta.</div>
 
 <span class="field-label">Cómo validaste lo que propuso</span>
-<div class="field-answer">Probé la herramienta en el browser, generé posts para los 4 servicios en las 3 redes y verifiqué manualmente: (1) que no apareciera "precio de lanzamiento" ni promesas de alcance, (2) que los datos de contacto de Zayfy fueran correctos, (3) que el tono fuera accesible pero técnico, (4) que los hashtags fueran relevantes para Colombia/LATAM.</div>
+<div class="field-answer">Dos tipos de validación esta semana: <strong>(1) Manual para el Content Studio:</strong> probé las ~24 combinaciones principales (4 servicios × 3 redes × 2 objetivos) y verifiqué que no apareciera "precio de lanzamiento" ni promesas de alcance, que los datos de contacto fueran correctos y que los hashtags fueran relevantes para Colombia/LATAM. <strong>(2) Tests automatizados para el pipeline Python:</strong> usé Claude Code para generar tests con <code>pytest</code> para las funciones <code>qualify_lead()</code> y <code>generate_outreach()</code> en modo demo. Los tests verifican: que el salón de belleza califique con score ≥ 7, que la agencia digital sea descartada (score &lt; 7), que la respuesta tenga todos los campos requeridos, que el score esté en rango válido (1-10), y que el DM no use palabras prohibidas. Correr con <code>python -m pytest pipeline/tests/ -v</code>.</div>
 
 <span class="field-label">Qué acertó / qué falló la IA</span>
 <div class="field-answer">
-  <strong>Acertó:</strong> estructura de la herramienta (tabs, generador + banco de ideas + hashtags + leads), categorización por formato y red, distinción de tono entre LinkedIn (técnico/reflexivo) y TikTok (problema + solución corta). Los templates de DevOps para LinkedIn salieron muy buenos desde el primer intento.<br><br>
-  <strong>Falló / necesitó ajuste:</strong> algunos posts del Paquete Emprendedor para TikTok eran demasiado formales al inicio, sin el lenguaje coloquial colombiano. Los ajusté agregando contexto de que el nicho de TikTok habla de forma casual ("¿te pasa esto?", "POV").
+  <strong>Acertó:</strong> estructura de la herramienta (tabs, generador + banco de ideas + hashtags + leads), categorización por formato y red, distinción de tono entre LinkedIn (técnico/reflexivo) y TikTok (problema + solución corta). Los templates de DevOps para LinkedIn salieron muy buenos desde el primer intento. Para los tests: los casos de prueba que generó cubren exactamente los bordes relevantes (lead calificado, lead descartado, campos requeridos, rangos válidos).<br><br>
+  <strong>Falló / necesitó ajuste:</strong> algunos posts del Paquete Emprendedor para TikTok eran demasiado formales, sin el lenguaje coloquial colombiano. Los ajusté agregando contexto de tono ("¿te pasa esto?", "POV").
 </div>
 
 <span class="field-label">Habilidades practicadas esta semana</span>
@@ -331,12 +331,13 @@ table tr:hover td { background: var(--bg-2); }
 
 <div class="leccion">
   <div class="leccion-label">Lección aprendida</div>
-  <p>El harness que construyes alrededor del modelo define el 80% del resultado: el mismo Claude con contexto de Zayfy genera posts de marca, con contexto genérico genera texto de agencia sin alma.</p>
+  <p>La IA no solo genera el código — también genera los tests para ese código. Pedir los tests junto con la implementación es más barato que agregarlos después, y fuerza a pensar en los casos borde antes de que fallen en producción.</p>
 </div>
 
 <div class="evidence">
   <div class="evidence-title">Evidencia</div>
   <p><strong>Artifact publicado:</strong> Zayfy Content Studio — generador de posts con tabs para IG/TikTok/LinkedIn, banco de 20+ ideas, hashtags por categoría y mini-CRM de leads. Publicado el 18 nov 2026.</p>
+  <p><strong>Tests unitarios:</strong> <code>pipeline/tests/test_pipeline.py</code> — 6 tests con pytest para <code>qualify_lead()</code> y <code>generate_outreach()</code> en modo demo. Repositorio: <a href="https://github.com/YasminGiraldo-Cloudops/zayfy-growth-engine" target="_blank">github.com/YasminGiraldo-Cloudops/zayfy-growth-engine</a></p>
 </div>
 
 <hr>
@@ -345,45 +346,44 @@ table tr:hover td { background: var(--bg-2); }
 <h2 id="s3">Semana 3 — Fundamentos de CI/CD / Pipelines con IA</h2>
 
 <span class="field-label">¿Analizaste, troubleshooteaste o mejoraste un pipeline (propio o del sandbox) con ayuda de IA esta semana?</span>
-<div class="field-answer">Sí. Diseñé con IA el pipeline de automatización de leads del <strong>Zayfy Growth Engine</strong> (Fase 2-3): un flujo de n8n que monitorea hashtags en IG/TikTok, califica leads con Claude API y genera mensajes de outreach personalizados. Es el pipeline que reemplazará la búsqueda manual de clientes.</div>
+<div class="field-answer">Sí. Implementé el <strong>pipeline de CI con GitHub Actions</strong> para el Zayfy Growth Engine: un workflow que corre automáticamente en cada push a <code>main</code>, instala las dependencias, ejecuta el script de leads en modo demo y verifica que el artefacto de resultados se genere. Es el flujo exacto del módulo: Código → Push → VCS → CI Pipeline → Verificación de artefacto.</div>
 
 <span class="field-label">Contexto que le diste a la IA</span>
 <div class="field-answer">
   <ul>
-    <li>Objetivo: pasar de L2 (búsqueda manual con IA ocasional) a L3 (IA ejecuta el ciclo, humano aprueba resultados clave)</li>
-    <li>Hashtags a monitorear: <code>#tiendaonline #vendoporinsta #negocioscolombia #venderportiktok #emprendimientocol</code></li>
-    <li>Criterio de calificación: micronegocio colombiano/latinoamericano con señales de venta online sin herramientas propias</li>
-    <li>Restricción: humano aprueba SIEMPRE antes de enviar cualquier DM</li>
-    <li>Stack disponible: n8n (ya lo tengo), Claude API, Google Sheets, WhatsApp Business API</li>
+    <li>El Growth Engine tiene un script Python que llama a Claude API: si alguien cambia el prompt o la lógica de calificación, necesitamos saber si sigue funcionando antes de hacer merge</li>
+    <li>Stack de CI elegido: GitHub Actions (ya lo uso en Zayfy para el sitio web con Next.js)</li>
+    <li>Dos jobs: <code>run-pipeline-demo</code> (corre en cada push y PR, sin API key) y <code>run-pipeline-real</code> (solo en pushes a <code>main</code>, requiere <code>ANTHROPIC_API_KEY</code> como secret)</li>
+    <li>Restricción: el token de acceso no tenía scope <code>workflow</code>, así que el archivo se subió desde la interfaz web de GitHub Actions en vez de desde la CLI</li>
   </ul>
 </div>
 
 <span class="field-label">Problema o pregunta que trabajaste</span>
-<div class="field-answer">¿Cómo estructuro un pipeline de n8n que sea económicamente viable (menos de USD 2/semana en IA) y que mantenga la aprobación humana para el primer contacto con clientes? El reto era equilibrar automatización y control: demasiado autónomo = riesgo de spam; demasiado manual = no escala.</div>
+<div class="field-answer">¿Cómo garantizo que un cambio al script o a los prompts no rompa el pipeline antes de que llegue a producción? Sin CI, el único momento de descubrir un error es al correrlo manualmente. El riesgo es exactamente el que describió el módulo: los pasos se hacen de forma inconsistente entre personas, nadie recuerda todos los steps, y no hay prueba automática de que el release es seguro.</div>
 
 <span class="field-label">Cómo usaste la IA</span>
-<div class="field-answer">Claude Code me ayudó a diseñar la arquitectura de 4 fases y los prompts de calificación. Le pedí que optimizara el costo: usar Claude Haiku para clasificación (tarea simple, respuesta JSON corta) y Claude Sonnet solo para generación de outreach personalizado (tarea compleja). También diseñé el prompt de calificación de leads con la IA.</div>
+<div class="field-answer">Claude Code me ayudó a diseñar el workflow paso a paso: el orden de los steps (checkout → setup-python → pip install → python en modo demo → verificar artefacto), el condicional del segundo job (<code>if: github.ref == 'refs/heads/main'</code>), y la forma de leer el secret sin exponerlo en los logs. También me sugirió usar el modo <code>--demo</code> del script como "test funcional" del pipeline: corre sin API key pero valida toda la lógica de calificación y generación.</div>
 
 <span class="field-label">Cómo validaste lo que propuso</span>
-<div class="field-answer">Validé la arquitectura contra las limitaciones reales de las APIs: Meta Content Publishing API tiene rate limits para cuentas nuevas, Apify tiene plan gratuito con 5 USD de crédito mensual. Calculé el costo estimado: ~40 leads/semana con Haiku ≈ USD 0.08, 3 posts con Sonnet ≈ USD 0.30. Total semana: ~USD 0.40–1.50. Viable.</div>
+<div class="field-answer">Verifiqué que el workflow cumpliera la secuencia del módulo de CI/CD: (1) instalar dependencias, (2) correr los tests funcionales (modo demo valida la lógica completa), (3) verificar el artefacto generado (<code>pipeline_results.json</code>), (4) si algo falla → pipeline rojo → no se hace merge. También revisé que los secrets de GitHub Actions no se expusieran en los logs del workflow.</div>
 
 <span class="field-label">Qué acertó / qué falló la IA</span>
 <div class="field-answer">
-  <strong>Acertó:</strong> la decisión de separar calificación (Haiku) de generación (Sonnet) fue exactamente el concepto de clasificación de modelos del módulo 2 aplicado en práctica. También acertó en identificar que la aprobación por WhatsApp es el ChatOps natural para este caso (lo veremos en Semana 7).<br><br>
-  <strong>Pendiente de validar:</strong> el pipeline está diseñado pero no implementado todavía. Semana 2 del mes siguiente es el piloto.
+  <strong>Acertó:</strong> la idea de usar el modo <code>--demo</code> del script como el "test" de CI fue exactamente la solución correcta. Permite validar toda la lógica sin exponer credenciales, en cualquier PR o push de cualquier colaborador. La estructura con dos jobs separados (demo siempre, real solo en main) también fue una decisión correcta desde el primer intento.<br><br>
+  <strong>Falló / aprendizaje:</strong> el token de GitHub no tenía el scope <code>workflow</code> necesario para hacer push del archivo <code>.yml</code> desde la CLI. Tuve que subirlo desde la interfaz web. Lección: revisar los permisos del PAT antes de crear archivos en <code>.github/workflows/</code> — es un scope que hay que habilitar explícitamente.
 </div>
 
 <span class="field-label">Habilidades practicadas esta semana</span>
 <div class="checkboxes">
-  <div class="checkbox-item"><div class="cb"></div> Contexto estructurado a la IA</div>
-  <div class="checkbox-item checked-item"><div class="cb checked">✓</div> Investigación antes de solución</div>
+  <div class="checkbox-item checked-item"><div class="cb checked">✓</div> Contexto estructurado a la IA</div>
+  <div class="checkbox-item"><div class="cb"></div> Investigación antes de solución</div>
   <div class="checkbox-item checked-item"><div class="cb checked">✓</div> Validación de comandos/config</div>
-  <div class="checkbox-item"><div class="cb"></div> Protección de información sensible</div>
+  <div class="checkbox-item checked-item"><div class="cb checked">✓</div> Protección de información sensible</div>
 </div>
 
 <div class="leccion">
   <div class="leccion-label">Lección aprendida</div>
-  <p>Diseñar el pipeline en papel (con IA) antes de tocar n8n ahorra horas: el prompt de calificación de leads necesitó 4 iteraciones hasta quedar bien, y eso es infinitamente más rápido en texto que en nodos de n8n.</p>
+  <p>Un pipeline de CI no es burocracia: es la prueba automática de que el código es seguro para hacer merge. La decisión de tener un modo <code>--demo</code> en el script fue lo que hizo posible tener CI sin exponer credenciales — ese tipo de decisión de diseño se toma antes de escribir una línea del workflow.</p>
 </div>
 
 <hr>
@@ -438,31 +438,31 @@ table tr:hover td { background: var(--bg-2); }
 <h2 id="s5">Semana 5 — Introducción a agentes / Desarrollo de agentes</h2>
 
 <span class="field-label">¿Construiste, configuraste o probaste un agente de IA aplicado a tu problema esta semana?</span>
-<div class="field-answer">Sí. Construí el <strong>Content Studio como harness/agente</strong> de generación de contenido para Zayfy. Aunque en esta fase no hace llamadas en tiempo real a la API de Claude (usa templates inteligentes), la arquitectura está diseñada como harness: recibe contexto estructurado (servicio + red + formato + nicho + objetivo), razona sobre qué template aplica y genera el output listo para publicar. El paso a Claude API en tiempo real es la Fase 2 del mismo artefacto.</div>
+<div class="field-answer">Sí. Construí el <strong>Zayfy Growth Engine como pipeline secuencial con Claude API</strong>, aplicando el patrón ReAct del módulo: cada lead pasa por un ciclo Razonar → Actuar → Observar antes de que el pipeline decida si genera un DM o descarta la cuenta. <code>qualify_lead()</code> razona sobre los criterios, llama a Claude Haiku como acción, observa el JSON devuelto (score + señales) y el pipeline decide el siguiente paso según el score.</div>
 
 <span class="field-label">Contexto que le diste a la IA</span>
 <div class="field-answer">
   <ul>
-    <li>Definición de lo que el agente debe hacer: recibir 5 parámetros, seleccionar el template más adecuado, devolver 1 post principal + 2 variaciones</li>
-    <li>Los 4 servicios de Zayfy con sus propuestas de valor diferenciadas por nicho</li>
-    <li>El formato específico de cada red: longitud, hashtags, emojis, llamados a acción</li>
-    <li>Las restricciones de marca que el agente nunca debe violar</li>
+    <li>Anatomía del agente según el módulo: Agent (nombre + rol) + Instruction (system prompt) + Model (LLM) + Tools (funciones Python)</li>
+    <li>El problema específico: clasificar una cuenta de Instagram como cliente potencial o descartarla, con un score 1-10 y señales positivas/negativas</li>
+    <li>Restricción de costo: la clasificación debe ser económica (~USD 0.002/lead); la generación creativa puede usar un modelo más costoso</li>
+    <li>Tipo de agente necesario: Secuencial (Fase 1 → calificar; Fase 2 → generar DM solo si score ≥ 7). No paralelo porque el DM requiere el resultado de la calificación</li>
   </ul>
 </div>
 
 <span class="field-label">Problema o pregunta que trabajaste</span>
-<div class="field-answer">¿Cómo hago que el agente produzca posts que suenen a Zayfy y no a "post genérico de agencia de marketing"? El desafío de agentes de contenido es siempre la consistencia de voz. Un agente que genera en volumen tiende a aplanar la personalidad de la marca.</div>
+<div class="field-answer">¿Qué tipo de agente necesita este problema y cuál framework usar? El módulo comparó LangGraph (grafos de estado), CrewAI (agentes con roles), OpenAI Agents SDK, Microsoft Agent Framework y Google ADK. Cada uno tiene trade-offs de complejidad vs. control. Para el Growth Engine, la pregunta era si valía la pena la abstracción de un framework o si una llamada directa a la Claude API era suficiente.</div>
 
 <span class="field-label">Cómo usaste la IA</span>
-<div class="field-answer">Claude Code generó tanto el harness (la herramienta web) como el contenido dentro del harness (los templates). Esto es el Agentic SDLC en práctica: yo definí el SPEC (qué debe hacer el agente, con qué restricciones), la IA ejecutó el Production Loop (generó el código, los templates, la lógica de selección). Revisé y ajusté los outputs hasta que la voz era consistente con Zayfy.</div>
+<div class="field-answer">Claude Code me ayudó a mapear <code>lead_pipeline.py</code> a la anatomía de agente del módulo: <strong>Agent</strong> = función <code>qualify_lead()</code> con su rol definido; <strong>Instruction</strong> = <code>QUALIFICATION_PROMPT</code> (el system prompt con criterios de Zayfy); <strong>Model</strong> = <code>claude-haiku-4-5</code> para clasificación, <code>claude-sonnet-4-5</code> para generación; <strong>Tools</strong> = <code>json.loads()</code> para parsear la respuesta estructurada. También usé la IA para decidir entre frameworks: Google ADK agrega valor cuando hay orquestación compleja o estado persistente; para un pipeline de 2 pasos, la llamada directa a la API es más simple y más fácil de depurar.</div>
 
 <span class="field-label">Cómo validaste lo que propuso</span>
-<div class="field-answer">Probé las ~24 combinaciones principales (4 servicios × 3 redes × 2 objetivos) y verifiqué: (1) voz correcta por red (TikTok casual, LinkedIn profesional, IG entre ambas), (2) ningún post prometía alcance ni usaba "precio de lanzamiento", (3) los datos de contacto eran correctos, (4) los hashtags eran relevantes para Colombia/LATAM. También pedí a Cristian (co-fundador) que leyera 3 posts y confirmara que sonaban a Zayfy.</div>
+<div class="field-answer">Mapeé el pipeline a los 5 tipos de agente del módulo: (1) Simple (un solo paso), (2) Secuencial (pasos en orden), (3) Paralelo (pasos simultáneos), (4) Loop (hasta cumplir criterio), (5) Multi-agente (coordinador + sub-agentes). El Growth Engine es tipo <strong>Secuencial</strong> — exactamente el tipo correcto: calificación → si score ≥ 7 → generación. Corrí los 3 leads de prueba y verifiqué que el flujo ReAct se ejecutara: <code>@belleza_cali_oficial</code> (score 9 → DM generado), <code>@modas_valentina_mde</code> (score 8 → DM generado), <code>@agencia_digital_xyz</code> (score 2 → descartado). El patrón ReAct se cumple en cada iteración.</div>
 
 <span class="field-label">Qué acertó / qué falló la IA</span>
 <div class="field-answer">
-  <strong>Acertó:</strong> la variación de tono por red es excelente desde el primer intento. Los posts de LinkedIn para DevOps suenan a un ingeniero reflexionando, no a un anuncio. Los de TikTok para Paquete Emprendedor tienen la estructura "problema → solución → CTA" que funciona en esa red.<br><br>
-  <strong>Falló / ajusté:</strong> los posts de Cloud Rescue para Instagram estaban demasiado técnicos para la audiencia. Los reescribí para que hablaran en términos de consecuencias del negocio ("tu sistema costando el doble") en vez de términos técnicos ("instancias sin revisar").
+  <strong>Acertó:</strong> la decisión de no usar Google ADK para esta etapa. El módulo dice que ADK agrega valor cuando hay estado complejo, herramientas externas o coordinación entre sub-agentes. Un pipeline de 2 pasos con 3 leads de prueba no justifica la abstracción: una llamada directa a la API es más simple, más fácil de depurar y no requiere dependencia de un framework adicional. Esta es la misma lógica de "usar el modelo adecuado para cada tarea".<br><br>
+  <strong>Aprendizaje:</strong> el patrón ReAct no requiere un framework; cualquier función que siga el ciclo Razonar (construir prompt con criterios) → Actuar (llamar al LLM) → Observar (parsear JSON y tomar decisión) implementa ReAct, aunque no use LangGraph ni ADK. El framework solo es necesario cuando los ciclos se vuelven dinámicos o el estado es persistente.
 </div>
 
 <span class="field-label">Habilidades practicadas esta semana</span>
@@ -475,7 +475,12 @@ table tr:hover td { background: var(--bg-2); }
 
 <div class="leccion">
   <div class="leccion-label">Lección aprendida</div>
-  <p>Me sorprende todo lo que se puede lograr en una sesión — un agente de contenido completo con marca, restricciones y variaciones por red. La IA no reemplaza el criterio de marca, pero lo ejecuta a velocidad imposible para un humano solo.</p>
+  <p>Un framework de agentes no hace al agente: el patrón ReAct (Razonar → Actuar → Observar) está en la lógica del código, no en la librería. ADK, LangGraph y CrewAI son útiles cuando el problema es complejo; para un pipeline secuencial de 2 pasos, la llamada directa a la API es más simple, más barata y más fácil de probar.</p>
+</div>
+
+<div class="evidence">
+  <div class="evidence-title">Evidencia</div>
+  <p><strong>Código:</strong> <code>pipeline/lead_pipeline.py</code> — implementación del pipeline secuencial ReAct con Claude Haiku (calificación) + Claude Sonnet (generación de DM). Repositorio: <a href="https://github.com/YasminGiraldo-Cloudops/zayfy-growth-engine" target="_blank">github.com/YasminGiraldo-Cloudops/zayfy-growth-engine</a></p>
 </div>
 
 <hr>
