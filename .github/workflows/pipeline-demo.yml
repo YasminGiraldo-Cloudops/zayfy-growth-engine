@@ -1,0 +1,70 @@
+name: Zayfy Growth Engine — Pipeline Demo
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  run-pipeline-demo:
+    name: Run lead qualification pipeline (demo mode)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install anthropic pytest
+
+      - name: Run pipeline in demo mode (no API key needed)
+        run: python -X utf8 pipeline/lead_pipeline.py --demo
+
+      - name: Run unit tests
+        run: python -m pytest pipeline/tests/ -v
+
+      - name: Verify output file was created
+        run: |
+          if [ -f "pipeline/pipeline_results.json" ]; then
+            echo "pipeline_results.json generado correctamente"
+            cat pipeline/pipeline_results.json
+          else
+            echo "ERROR: pipeline_results.json no fue creado"
+            exit 1
+          fi
+
+  run-pipeline-real:
+    name: Run pipeline with Claude API (requires secret)
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install anthropic
+
+      - name: Run pipeline with real Claude API
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          if [ -z "$ANTHROPIC_API_KEY" ]; then
+            echo "ANTHROPIC_API_KEY no configurada — corriendo en modo demo"
+            python -X utf8 pipeline/lead_pipeline.py --demo
+          else
+            echo "Corriendo con Claude API real"
+            python -X utf8 pipeline/lead_pipeline.py
+          fi
