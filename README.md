@@ -5,7 +5,7 @@ Proyecto integrador del programa **AI-Driven DevOps Accelerator** (SoftServe, se
 **Participante:** Yasmín Giraldo — Co-fundadora Zayfy · DevOps & Cloud (AWS)  
 **Ruta:** B — Problema propio
 
-![CI](https://github.com/YasminGiraldo-Cloudops/zayfy-growth-engine/actions/workflows/pipeline-demo.yml/badge.svg)
+
 
 ---
 
@@ -15,18 +15,18 @@ Zayfy necesita encontrar clientes potenciales y producir contenido para redes so
 
 ## Solución: 3 fases
 
-### Fase 1 — Content Studio ✅ (nov 2026)
+### Fase 1 — Content Studio  (nov 2026)
 Herramienta web que genera posts listos para publicar en Instagram, TikTok y LinkedIn, adaptados a los 4 servicios de Zayfy y al Paquete Emprendedor.
 
 - **Archivo:** [`content-studio.html`](content-studio.html)
 - **Resultado:** De 30 min a 2 min por post. Sin costo de API (templates locales).
 
-### Fase 2 — Pipeline Python + CI/CD ✅ (nov 2026)
+### Fase 2 — Pipeline Python + CI/CD  (nov 2026)
 Pipeline ejecutable en Python que califica leads con Claude Haiku (patrón ReAct) y genera mensajes de outreach personalizados con Claude Sonnet. CI/CD con GitHub Actions: 2 jobs (demo + real), 6 tests unitarios con pytest.
 
 - **Pipeline:** [`pipeline/lead_pipeline.py`](pipeline/lead_pipeline.py)
 - **Tests:** [`pipeline/tests/test_pipeline.py`](pipeline/tests/test_pipeline.py)
-- **CI:** `.github/workflows/pipeline-demo.yml` — ✅ verde
+- **CI:** `.github/workflows/pipeline-demo.yml` —  verde
 
 ### Fase 3 — Pipeline n8n completo (dic 2026)
 Pipeline automatizado que monitorea hashtags en IG/TikTok, califica leads con Claude API y genera mensajes de outreach personalizados, con aprobación humana antes de enviar.
@@ -49,12 +49,6 @@ Pipeline automatizado que monitorea hashtags en IG/TikTok, califica leads con Cl
 | Apify | Scraping de hashtags IG/TikTok (Fase 3) |
 | Buffer / Later | Publicación programada (Fase 3) |
 | AWS (ECS, RDS, CloudFront) | Infraestructura |
-
----
-
-## Bitácora del programa
-
-[`bitacora-devops-zayfy.html`](bitacora-devops-zayfy.html) — registro de los 8 módulos del programa AI-Driven DevOps Accelerator: reflexiones, decisiones técnicas tomadas para Zayfy Growth Engine, lecciones aprendidas y evidencias del proceso (código, CI verde, artefactos publicados).
 
 ---
 
