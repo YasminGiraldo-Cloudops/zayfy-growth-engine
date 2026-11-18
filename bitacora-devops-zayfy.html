@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Bitácora DevOps + IA — Zayfy</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+:root {
+  --bg: #ffffff;
+  --bg-2: #f8f9fc;
+  --bg-3: #f0f2f7;
+  --border: rgba(0,0,0,0.09);
+  --border-strong: rgba(0,0,0,0.15);
+  --fg: #111827;
+  --fg-muted: #4b5563;
+  --fg-dim: #9ca3af;
+  --accent: #4f46e5;
+  --accent-light: rgba(79,70,229,0.07);
+  --accent-2: #059669;
+  --accent-2-light: rgba(5,150,105,0.07);
+  --warn: #d97706;
+  --warn-light: rgba(217,119,6,0.07);
+  --checked: #4f46e5;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f1117; --bg-2: #171b26; --bg-3: #1e2333;
+    --border: rgba(255,255,255,0.08); --border-strong: rgba(255,255,255,0.14);
+    --fg: #e8eaf0; --fg-muted: #9199aa; --fg-dim: #4f5668;
+    --accent: #7c72f8; --accent-light: rgba(124,114,248,0.1);
+    --accent-2: #34d399; --accent-2-light: rgba(52,211,153,0.1);
+    --warn: #fbbf24; --warn-light: rgba(251,191,36,0.1);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f1117; --bg-2: #171b26; --bg-3: #1e2333;
+  --border: rgba(255,255,255,0.08); --border-strong: rgba(255,255,255,0.14);
+  --fg: #e8eaf0; --fg-muted: #9199aa; --fg-dim: #4f5668;
+  --accent: #7c72f8; --accent-light: rgba(124,114,248,0.1);
+  --accent-2: #34d399; --accent-2-light: rgba(52,211,153,0.1);
+  --warn: #fbbf24; --warn-light: rgba(251,191,36,0.1);
+  color-scheme: dark;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 15px; line-height: 1.75;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-bottom: max(48px, env(safe-area-inset-bottom, 0px));
+}
+
+/* PAGE */
+.page { max-width: 740px; margin: 0 auto; padding-top: 48px; }
+
+/* HEADER */
+.doc-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: clamp(26px, 5vw, 38px); font-weight: 700;
+  letter-spacing: -0.5px; color: var(--fg); margin-bottom: 6px;
+}
+.doc-meta {
+  font-size: 13px; color: var(--fg-dim); margin-bottom: 28px;
+  display: flex; gap: 6px; flex-wrap: wrap; align-items: center;
+}
+.meta-sep { color: var(--fg-dim); }
+.doc-desc { font-size: 14.5px; color: var(--fg-muted); margin-bottom: 32px; line-height: 1.65; }
+.doc-desc strong { color: var(--fg); }
+
+/* DIVIDER */
+hr { border: none; border-top: 1px solid var(--border); margin: 36px 0; }
+
+/* SECTION HEADINGS */
+h2 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 22px; font-weight: 700; color: var(--fg);
+  margin: 40px 0 16px; letter-spacing: -0.2px;
+}
+h3 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 15px; font-weight: 600; color: var(--fg);
+  margin: 24px 0 6px;
+}
+p { color: var(--fg-muted); margin-bottom: 14px; }
+p:last-child { margin-bottom: 0; }
+p strong { color: var(--fg); }
+
+/* BLOCKQUOTE — guidance */
+blockquote {
+  border-left: 3px solid var(--border-strong);
+  padding: 10px 16px; margin: 12px 0 20px;
+  background: var(--bg-2); border-radius: 0 6px 6px 0;
+}
+blockquote p { font-size: 13.5px; color: var(--fg-muted); font-style: italic; }
+
+/* FIELD LABELS */
+.field-label {
+  font-weight: 600; font-size: 14px; color: var(--fg);
+  margin-top: 20px; margin-bottom: 6px; display: block;
+}
+
+/* FIELD ANSWER */
+.field-answer {
+  background: var(--bg-2); border: 1px solid var(--border);
+  border-radius: 6px; padding: 12px 14px;
+  font-size: 14px; color: var(--fg-muted); line-height: 1.65;
+  margin-bottom: 4px;
+}
+.field-answer strong { color: var(--fg); }
+.field-answer ul { padding-left: 18px; margin-top: 6px; }
+.field-answer li { margin-bottom: 4px; }
+.field-answer code {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px; background: var(--bg-3);
+  padding: 1px 5px; border-radius: 3px; color: var(--fg);
+}
+
+/* CHECKBOXES */
+.checkboxes { display: flex; flex-direction: column; gap: 6px; margin: 14px 0; }
+.checkbox-item { display: flex; align-items: center; gap: 10px; font-size: 14px; color: var(--fg-muted); }
+.cb {
+  width: 16px; height: 16px; border: 1.5px solid var(--border-strong);
+  border-radius: 3px; flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+  font-size: 10px; color: transparent;
+}
+.cb.checked {
+  background: var(--accent); border-color: var(--accent); color: white;
+}
+.checkbox-item.checked-item { text-decoration: line-through; color: var(--fg-dim); }
+
+/* LECCIÓN */
+.leccion {
+  background: var(--accent-light); border: 1px solid rgba(79,70,229,0.15);
+  border-radius: 6px; padding: 12px 14px; margin-top: 16px;
+}
+.leccion-label {
+  font-size: 11px; font-weight: 700; letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--accent); margin-bottom: 4px;
+}
+.leccion p { font-size: 14px; color: var(--fg); font-style: italic; }
+
+/* TABLE */
+table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 13.5px; }
+table th {
+  background: var(--bg-3); padding: 10px 14px; text-align: left;
+  font-size: 12px; font-weight: 600; letter-spacing: 0.04em;
+  color: var(--fg-muted); border-bottom: 1px solid var(--border-strong);
+}
+table td {
+  padding: 10px 14px; border-bottom: 1px solid var(--border);
+  color: var(--fg-muted); vertical-align: top;
+}
+table td:first-child { font-weight: 500; color: var(--fg); }
+table tr:last-child td { border-bottom: none; }
+table tr:hover td { background: var(--bg-2); }
+.overflow-table { overflow-x: auto; }
+
+/* ENCABEZADO TABLE */
+.enc-table { margin-bottom: 28px; }
+.enc-table td:first-child { width: 200px; color: var(--fg-muted); font-weight: 400; }
+.enc-table td:last-child { font-weight: 500; color: var(--fg); }
+
+/* EVIDENCE BOX */
+.evidence {
+  background: var(--bg-2); border: 1px solid var(--border);
+  border-radius: 8px; padding: 16px 18px; margin: 16px 0;
+}
+.evidence-title {
+  font-size: 12px; font-weight: 700; letter-spacing: 0.07em;
+  text-transform: uppercase; color: var(--fg-dim); margin-bottom: 8px;
+}
+.evidence p { font-size: 13.5px; }
+.evidence ul { padding-left: 18px; font-size: 13.5px; color: var(--fg-muted); }
+.evidence li { margin-bottom: 4px; }
+
+/* CONSOLIDATED */
+.project-summary {
+  background: var(--accent-light); border: 1px solid rgba(79,70,229,0.12);
+  border-radius: 8px; padding: 20px 22px; margin: 20px 0;
+}
+.project-summary h3 { margin-top: 0; color: var(--accent); }
+
+/* TOC */
+.toc {
+  background: var(--bg-2); border: 1px solid var(--border);
+  border-radius: 8px; padding: 16px 20px; margin: 24px 0 36px;
+}
+.toc-title { font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--fg-dim); margin-bottom: 10px; }
+.toc ol { padding-left: 20px; color: var(--fg-muted); font-size: 13.5px; }
+.toc li { margin-bottom: 4px; }
+.toc a { color: var(--accent); text-decoration: none; }
+.toc a:hover { text-decoration: underline; }
+
+/* THEME */
+.theme-btn {
+  position: fixed; top: 16px; right: max(16px, env(safe-area-inset-right, 0px));
+  background: var(--bg-2); border: 1px solid var(--border);
+  border-radius: 20px; padding: 5px 12px; font-size: 12px;
+  color: var(--fg-muted); cursor: pointer; z-index: 10;
+}
+.theme-btn:hover { color: var(--fg); }
+
+@media (max-width: 500px) {
+  .enc-table td:first-child { width: 140px; }
+  h2 { font-size: 19px; }
+}
+</style>
+</head>
+<body>
+<button class="theme-btn" onclick="document.documentElement.setAttribute('data-theme', document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark')">◐ Tema</button>
+
+<div class="page">
+
+<h1 class="doc-title">Bitácora de Colaboración con IA</h1>
+<div class="doc-meta">
+  <span>18 de noviembre de 2026</span>
+  <span class="meta-sep">·</span>
+  <span>@YasminGiraldo</span>
+  <span class="meta-sep">·</span>
+  <span>AI-Driven DevOps Accelerator · SoftServe</span>
+</div>
+<p class="doc-desc">
+  Bitácora oficial del programa <strong>AI-Driven DevOps Accelerator</strong> (SoftServe, 21 sep – 19 nov 2026), ruta B — Problema propio. Documento con evidencia semana a semana de cómo apliqué los conceptos del curso a un problema real de Zayfy.
+</p>
+
+<div class="toc">
+  <div class="toc-title">Contenido</div>
+  <ol>
+    <li><a href="#encabezado">Encabezado del participante</a></li>
+    <li><a href="#s1">Semana 1 — Fundamentos de IA (diagnóstico inicial)</a></li>
+    <li><a href="#s2">Semana 2 — Desarrollo asistido por IA / Testing</a></li>
+    <li><a href="#s3">Semana 3 — Fundamentos de CI/CD / Pipelines con IA</a></li>
+    <li><a href="#s4">Semana 4 — Arquitecturas modernas / Servicios de IA en la nube</a></li>
+    <li><a href="#s5">Semana 5 — Introducción a agentes / Desarrollo de agentes</a></li>
+    <li><a href="#s6">Semana 6 — Observabilidad moderna / AIOps</a></li>
+    <li><a href="#s7">Semana 7 — Runbooks inteligentes / ChatOps con IA</a></li>
+    <li><a href="#s8">Semana 8 — DevSecOps + IA responsable</a></li>
+    <li><a href="#consolidado">Consolidado — Proyecto Integrador</a></li>
+  </ol>
+</div>
+
+<!-- ===== ENCABEZADO ===== -->
+<h2 id="encabezado">Encabezado del participante</h2>
+
+<div class="overflow-table">
+<table class="enc-table">
+  <tr><td>Nombre</td><td>Yasmín Giraldo</td></tr>
+  <tr><td>Empresa / Rol</td><td>Zayfy · Co-fundadora · DevOps &amp; Cloud (AWS)</td></tr>
+  <tr><td>Ruta elegida</td><td>✅ B — Problema propio</td></tr>
+  <tr><td>Proyecto elegido</td><td>Zayfy Growth Engine — automatizar la búsqueda de clientes potenciales en Instagram y TikTok, y la generación de contenido para redes sociales (IG, TikTok, LinkedIn) aplicando IA en cada etapa del flujo.</td></tr>
+  <tr><td>Stack utilizado</td><td>Claude Code (Sonnet), n8n, AWS (ECS, RDS, CloudFront), GitHub Actions, Terraform, Next.js, Claude API (Haiku + Sonnet), Python</td></tr>
+</table>
+</div>
+
+<hr>
+
+<!-- ===== SEMANA 1 ===== -->
+<h2 id="s1">Semana 1 — Fundamentos de IA para ingenieros (diagnóstico inicial)</h2>
+
+<blockquote><p>Esta semana es de conceptos. El objetivo es dejar una foto de dónde estás hoy, antes de empezar a aplicar nada.</p></blockquote>
+
+<span class="field-label">¿Ya usas IA en tu trabajo, o es tu primer acercamiento?</span>
+<div class="checkboxes">
+  <div class="checkbox-item checked-item"><div class="cb checked">✓</div> Ya la uso regularmente</div>
+  <div class="checkbox-item"><div class="cb"></div> La he probado poco</div>
+  <div class="checkbox-item"><div class="cb"></div> Es la primera vez</div>
+</div>
+
+<span class="field-label">¿Qué modelo(s) o herramienta(s) usas o has probado?</span>
+<div class="field-answer">Claude Code (Sonnet) como harness principal para arquitectura y código. GitHub Copilot para completar inline en el IDE. ChatGPT ocasionalmente para borradores de texto. Claude Sonnet directamente para diseño de arquitecturas AWS y revisión de Terraform.</div>
+
+<span class="field-label">Si ya la usas: ¿para qué la has usado hasta ahora?</span>
+<div class="field-answer">Para generar y revisar configuraciones de infraestructura (Terraform, docker-compose, GitHub Actions). Para diseñar arquitecturas en AWS antes de implementar. Para escribir scripts de automatización en Python. Para revisar PRs y sugerir mejoras de seguridad. Recientemente, para generar el sitio web de Zayfy en Next.js.</div>
+
+<span class="field-label">Si ya la usas: ¿sueles validar lo que te da, o normalmente lo tomas tal cual?</span>
+<div class="field-answer">Siempre valido. En infraestructura es obligatorio: hago <code>terraform plan</code> antes de <code>apply</code>, reviso que los recursos generados sean los esperados. Para código, corro los tests y pruebo manualmente. Mi regla: la IA propone, yo decido y verifico. Especialmente en seguridad (IAM, secrets, networking): nunca tomo eso tal cual.</div>
+
+<span class="field-label">Describe tu entorno de trabajo actual</span>
+<div class="field-answer">AWS como cloud principal (ECS para contenedores, RDS para bases de datos, CloudFront + S3 para frontends estáticos, Route 53). GitHub Actions para CI/CD. Terraform para IaC. Docker localmente y en producción. Next.js para el sitio de Zayfy. Python para scripts de automatización. n8n para flujos de automatización no-code. Mac como máquina principal.</div>
+
+<span class="field-label">¿Qué esperas lograr con este curso en tu día a día?</span>
+<div class="field-answer">Pasar de usar la IA de forma reactiva (cuando me trabo) a integrarla como capa de infraestructura deliberada en Zayfy. Específicamente: (1) automatizar la búsqueda de clientes potenciales para que no dependa de búsqueda manual, (2) generar contenido de redes sociales en volumen sin sacrificar calidad de marca, y (3) tener el criterio técnico para decidir dónde conviene L2, L3 o L4 de automatización en cada proceso de Zayfy.</div>
+
+<hr>
+
+<!-- ===== SEMANA 2 ===== -->
+<h2 id="s2">Semana 2 — Desarrollo asistido por IA / Testing y calidad con IA</h2>
+
+<span class="field-label">¿Usaste IA para acelerar programación, debugging, documentación o revisión de código esta semana? ¿O para generar o mejorar casos de prueba?</span>
+<div class="field-answer">Sí. Usé Claude Code para construir el <strong>Zayfy Content Studio</strong>: una herramienta web que genera posts listos para publicar en Instagram, TikTok y LinkedIn, adaptados a los 4 servicios de Zayfy y al Paquete Emprendedor. El desarrollo completo (HTML, CSS, JS, templates de contenido) se hizo en una sesión asistida por IA.</div>
+
+<span class="field-label">Contexto que le diste a la IA</span>
+<div class="field-answer">
+  <ul>
+    <li>Descripción completa de los servicios de Zayfy (Cloud Rescue, DevOps Partner, Software Dev, AI &amp; Automation, Paquete Emprendedor)</li>
+    <li>Audiencias objetivo: micronegocios, vendedoras TikTok, salones de belleza, restaurantes, startups tech</li>
+    <li>Voz de marca: "Beyond Code. Beyond Limits.", técnica pero accesible, mercado LATAM/Colombia</li>
+    <li>Redes: Instagram (carrusel, reel, story), TikTok (tutorial, dueto, resultado), LinkedIn (reflexión, caso, dato + pregunta)</li>
+    <li>Restricciones: nunca prometer alcance, nunca "precio de lanzamiento", precios en COP</li>
+  </ul>
+</div>
+
+<span class="field-label">Problema o pregunta que trabajaste</span>
+<div class="field-answer">¿Cómo genero posts de calidad para 4 servicios × 3 redes × múltiples formatos × 7 nichos, sin que cada uno tome 30 minutos de escritura manual? El problema no es falta de ideas: es que el volumen de contenido necesario para tener presencia constante en 3 redes es inmanejable a mano.</div>
+
+<span class="field-label">Cómo usaste la IA</span>
+<div class="field-answer">Claude Code como harness: le di el contexto completo de Zayfy (el skill <code>zayfy-negocio</code> cargado en el sistema), los requisitos de la herramienta y las restricciones de marca. La IA generó el HTML/CSS/JS completo con más de 20 templates de posts, el banco de ideas y los hashtags curados. Revisé y ajusté los posts para verificar que la voz fuera correcta.</div>
+
+<span class="field-label">Cómo validaste lo que propuso</span>
+<div class="field-answer">Probé la herramienta en el browser, generé posts para los 4 servicios en las 3 redes y verifiqué manualmente: (1) que no apareciera "precio de lanzamiento" ni promesas de alcance, (2) que los datos de contacto de Zayfy fueran correctos, (3) que el tono fuera accesible pero técnico, (4) que los hashtags fueran relevantes para Colombia/LATAM.</div>
+
+<span class="field-label">Qué acertó / qué falló la IA</span>
+<div class="field-answer">
+  <strong>Acertó:</strong> estructura de la herramienta (tabs, generador + banco de ideas + hashtags + leads), categorización por formato y red, distinción de tono entre LinkedIn (técnico/reflexivo) y TikTok (problema + solución corta). Los templates de DevOps para LinkedIn salieron muy buenos desde el primer intento.<br><br>
+  <strong>Falló / necesitó ajuste:</strong> algunos posts del Paquete Emprendedor para TikTok eran demasiado formales al inicio, sin el lenguaje coloquial colombiano. Los ajusté agregando contexto de que el nicho de TikTok habla de forma casual ("¿te pasa esto?", "POV").
+</div>
+
+<span class="field-label">Habilidades practicadas esta semana</span>
+<div class="checkboxes">
+  <div class="checkbox-item checked-item"><div class="cb checked">✓</div> Contexto estructurado a la IA</div>
+  <div class="checkbox-item"><div class="cb"></div> Investigación antes de solución</div>
+  <div class="checkbox-item checked-item"><div class="cb checked">✓</div> Validación de comandos/config</div>
+  <div class="checkbox-item"><div class="cb"></div> Protección de información sensible</div>
+</div>
+
+<div class="leccion">
+  <div class="leccion-label">Lección aprendida</div>
+  <p>El harness que construyes alrededor del modelo define el 80% del resultado: el mismo Claude con contexto de Zayfy genera posts de marca, con contexto genérico genera texto de agencia sin alma.</p>
+</div>
+
+<div class="evidence">
+  <div class="evidence-title">Evidencia</div>
+  <p><strong>Artifact publicado:</strong> Zayfy Content Studio — generador de posts con tabs para IG/TikTok/LinkedIn, banco de 20+ ideas, hashtags por categoría y mini-CRM de leads. Publicado el 18 nov 2026.</p>
+</div>
+
+<hr>
+
+<!-- ===== SEMANA 3 ===== -->
+<h2 id="s3">Semana 3 — Fundamentos de CI/CD / Pipelines con IA</h2>
+
+<span class="field-label">¿Analizaste, troubleshooteaste o mejoraste un pipeline (propio o del sandbox) con ayuda de IA esta semana?</span>
+<div class="field-answer">Sí. Diseñé con IA el pipeline de automatización de leads del <strong>Zayfy Growth Engine</strong> (Fase 2-3): un flujo de n8n que monitorea hashtags en IG/TikTok, califica leads con Claude API y genera mensajes de outreach personalizados. Es el pipeline que reemplazará la búsqueda manual de clientes.</div>
+
+<span class="field-label">Contexto que le diste a la IA</span>
+<div class="field-answer">
+  <ul>
+    <li>Objetivo: pasar de L2 (búsqueda manual con IA ocasional) a L3 (IA ejecuta el ciclo, humano aprueba resultados clave)</li>
+    <li>Hashtags a monitorear: <code>#tiendaonline #vendoporinsta #negocioscolombia #venderportiktok #emprendimientocol</code></li>
+    <li>Criterio de calificación: micronegocio colombiano/latinoamericano con señales de venta online sin herramientas propias</li>
+    <li>Restricción: humano aprueba SIEMPRE antes de enviar cualquier DM</li>
+    <li>Stack disponible: n8n (ya lo tengo), Claude API, Google Sheets, WhatsApp Business API</li>
+  </ul>
+</div>
+
+<span class="field-label">Problema o pregunta que trabajaste</span>
+<div class="field-answer">¿Cómo estructuro un pipeline de n8n que sea económicamente viable (menos de USD 2/semana en IA) y que mantenga la aprobación humana para el primer contacto con clientes? El reto era equilibrar automatización y control: demasiado autónomo = riesgo de spam; demasiado manual = no escala.</div>
+
+<span class="field-label">Cómo usaste la IA</span>
+<div class="field-answer">Claude Code me ayudó a diseñar la arquitectura de 4 fases y los prompts de calificación. Le pedí que optimizara el costo: usar Claude Haiku para clasificación (tarea simple, respuesta JSON corta) y Claude Sonnet solo para generación de outreach personalizado (tarea compleja). También diseñé el prompt de calificación de leads con la IA.</div>
+
+<span class="field-label">Cómo validaste lo que propuso</span>
+<div class="field-answer">Validé la arquitectura contra las limitaciones reales de las APIs: Meta Content Publishing API tiene rate limits para cuentas nuevas, Apify tiene plan gratuito con 5 USD de crédito mensual. Calculé el costo estimado: ~40 leads/semana con Haiku ≈ USD 0.08, 3 posts con Sonnet ≈ USD 0.30. Total semana: ~USD 0.40–1.50. Viable.</div>
+
+<span class="field-label">Qué acertó / qué falló la IA</span>
+<div class="field-answer">
+  <strong>Acertó:</strong> la decisión de separar calificación (Haiku) de generación (Sonnet) fue exactamente el concepto de clasificación de modelos del módulo 2 aplicado en práctica. También acertó en identificar que la aprobación por WhatsApp es el ChatOps natural para este caso (lo veremos en Semana 7).<br><br>
+  <strong>Pendiente de validar:</strong> el pipeline está diseñado pero no implementado todavía. Semana 2 del mes siguiente es el piloto.
+</div>
+
+<span class="field-label">Habilidades practicadas esta semana</span>
+<div class="checkboxes">
+  <div class="checkbox-item"><div class="cb"></div> Contexto estructurado a la IA</div>
+  <div class="checkbox-item checked-item"><div class="cb checked">✓</div> Investigación antes de solución</div>
+  <div class="checkbox-item checked-item"><div class="cb checked">✓</div> Validación de comandos/config</div>
+  <div class="checkbox-item"><div class="cb"></div> Protección de información sensible</div>
+</div>
+
+<div class="leccion">
+  <div class="leccion-label">Lección aprendida</div>
+  <p>Diseñar el pipeline en papel (con IA) antes de tocar n8n ahorra horas: el prompt de calificación de leads necesitó 4 iteraciones hasta quedar bien, y eso es infinitamente más rápido en texto que en nodos de n8n.</p>
+</div>
+
+<hr>
+
+<!-- ===== SEMANA 4 ===== -->
+<h2 id="s4">Semana 4 — Arquitecturas modernas con IA / Servicios de IA en la nube</h2>
+
+<span class="field-label">¿Usaste IA para razonar sobre una decisión de arquitectura, o evaluaste/integraste algún servicio de IA gestionado esta semana?</span>
+<div class="field-answer">Sí. Evalué la <strong>Claude API de Anthropic</strong> para integrarla como capa de IA del Growth Engine. Comparé modelos (Haiku vs Sonnet vs Opus) para las dos tareas principales del pipeline: calificación de leads y generación de contenido/outreach. También razoné sobre la arquitectura de llamadas: directa desde n8n vs. un microservicio intermediario.</div>
+
+<span class="field-label">Contexto que le diste a la IA</span>
+<div class="field-answer">
+  <ul>
+    <li>Las dos tareas: clasificar si una cuenta es cliente potencial (simple, JSON) y generar un DM personalizado (creativo, largo)</li>
+    <li>Volumen esperado: ~40 clasificaciones/semana + ~10 DMs generados + 3 posts de contenido</li>
+    <li>Presupuesto máximo: USD 5/semana en la fase de validación</li>
+    <li>Restricción: Zayfy no tiene servidor propio todavía para IA, todo vía APIs gestionadas</li>
+  </ul>
+</div>
+
+<span class="field-label">Problema o pregunta que trabajaste</span>
+<div class="field-answer">¿Qué modelo uso para cada tarea y cómo llamo a la API desde n8n sin exponer las claves? El sesgo natural sería usar el modelo más capaz para todo (Sonnet), pero eso encarece innecesariamente la clasificación, que solo necesita un JSON con score 1-10.</div>
+
+<span class="field-label">Cómo usaste la IA</span>
+<div class="field-answer">Usé Claude Code para comparar las características de los modelos (el módulo 2 los clasifica en Rápidos/Razonamiento/Alto Contexto) y mapear cada tarea al modelo adecuado. También usé la IA para diseñar el prompt de calificación de leads que devuelve JSON estructurado y para calcular los tokens esperados por llamada.</div>
+
+<span class="field-label">Cómo validaste lo que propuso</span>
+<div class="field-answer">Calculé el costo por tarea con los precios de la API: Haiku (~USD 0.0008/1K tokens input, USD 0.0025/1K output) para clasificación = ~USD 0.002 por lead. Sonnet para generación de DM (~USD 0.003/1K input, USD 0.015/1K output) = ~USD 0.03 por DM. Con esos números, 40 leads + 10 DMs + 3 posts/semana ≈ USD 0.50–1.50. Dentro del presupuesto.</div>
+
+<span class="field-label">Qué acertó / qué falló la IA</span>
+<div class="field-answer">
+  <strong>Acertó:</strong> la decisión arquitectural de llamar directamente desde n8n al endpoint de Anthropic (sin microservicio intermediario) es correcta para esta escala. n8n tiene nodo HTTP Request nativo, y un microservicio extra solo agrega complejidad sin valor en volúmenes bajos.<br><br>
+  <strong>Aprendizaje importante:</strong> Para algunos casos era necesario pedir autorización — la API de Meta (para publicar contenido) requiere una app aprobada. No basta con tener una cuenta Business. Esto hay que tenerlo en cuenta antes de prometer tiempos al cliente.
+</div>
+
+<span class="field-label">Habilidades practicadas esta semana</span>
+<div class="checkboxes">
+  <div class="checkbox-item"><div class="cb"></div> Contexto estructurado a la IA</div>
+  <div class="checkbox-item checked-item"><div class="cb checked">✓</div> Investigación antes de solución</div>
+  <div class="checkbox-item"><div class="cb"></div> Validación de comandos/config</div>
+  <div class="checkbox-item checked-item"><div class="cb checked">✓</div> Protección de información sensible</div>
+</div>
+
+<div class="leccion">
+  <div class="leccion-label">Lección aprendida</div>
+  <p>No usar el modelo más caro para todo: Haiku para clasificar (tarea simple + JSON corto) y Sonnet para generar (tarea creativa + texto largo) reduce el costo ~70% con la misma calidad.</p>
+</div>
+
+<hr>
+
+<!-- ===== SEMANA 5 ===== -->
+<h2 id="s5">Semana 5 — Introducción a agentes / Desarrollo de agentes</h2>
+
+<span class="field-label">¿Construiste, configuraste o probaste un agente de IA aplicado a tu problema esta semana?</span>
+<div class="field-answer">Sí. Construí el <strong>Content Studio como harness/agente</strong> de generación de contenido para Zayfy. Aunque en esta fase no hace llamadas en tiempo real a la API de Claude (usa templates inteligentes), la arquitectura está diseñada como harness: recibe contexto estructurado (servicio + red + formato + nicho + objetivo), razona sobre qué template aplica y genera el output listo para publicar. El paso a Claude API en tiempo real es la Fase 2 del mismo artefacto.</div>
+
+<span class="field-label">Contexto que le diste a la IA</span>
+<div class="field-answer">
+  <ul>
+    <li>Definición de lo que el agente debe hacer: recibir 5 parámetros, seleccionar el template más adecuado, devolver 1 post principal + 2 variaciones</li>
+    <li>Los 4 servicios de Zayfy con sus propuestas de valor diferenciadas por nicho</li>
+    <li>El formato específico de cada red: longitud, hashtags, emojis, llamados a acción</li>
+    <li>Las restricciones de marca que el agente nunca debe violar</li>
+  </ul>
+</div>
+
+<span class="field-label">Problema o pregunta que trabajaste</span>
+<div class="field-answer">¿Cómo hago que el agente produzca posts que suenen a Zayfy y no a "post genérico de agencia de marketing"? El desafío de agentes de contenido es siempre la consistencia de voz. Un agente que genera en volumen tiende a aplanar la personalidad de la marca.</div>
+
+<span class="field-label">Cómo usaste la IA</span>
+<div class="field-answer">Claude Code generó tanto el harness (la herramienta web) como el contenido dentro del harness (los templates). Esto es el Agentic SDLC en práctica: yo definí el SPEC (qué debe hacer el agente, con qué restricciones), la IA ejecutó el Production Loop (generó el código, los templates, la lógica de selección). Revisé y ajusté los outputs hasta que la voz era consistente con Zayfy.</div>
+
+<span class="field-label">Cómo validaste lo que propuso</span>
+<div class="field-answer">Probé las ~24 combinaciones principales (4 servicios × 3 redes × 2 objetivos) y verifiqué: (1) voz correcta por red (TikTok casual, LinkedIn profesional, IG entre ambas), (2) ningún post prometía alcance ni usaba "precio de lanzamiento", (3) los datos de contacto eran correctos, (4) los hashtags eran relevantes para Colombia/LATAM. También pedí a Cristian (co-fundador) que leyera 3 posts y confirmara que sonaban a Zayfy.</div>
+
+<span class="field-label">Qué acertó / qué falló la IA</span>
+<div class="field-answer">
+  <strong>Acertó:</strong> la variación de tono por red es excelente desde el primer intento. Los posts de LinkedIn para DevOps suenan a un ingeniero reflexionando, no a un anuncio. Los de TikTok para Paquete Emprendedor tienen la estructura "problema → solución → CTA" que funciona en esa red.<br><br>
+  <strong>Falló / ajusté:</strong> los posts de Cloud Rescue para Instagram estaban demasiado técnicos para la audiencia. Los reescribí para que hablaran en términos de consecuencias del negocio ("tu sistema costando el doble") en vez de términos técnicos ("instancias sin revisar").
+</div>
+
+<span class="field-label">Habilidades practicadas esta semana</span>
+<div class="checkboxes">
+  <div class="checkbox-item checked-item"><div class="cb checked">✓</div> Contexto estructurado a la IA</div>
+  <div class="checkbox-item checked-item"><div class="cb checked">✓</div> Investigación antes de solución</div>
+  <div class="checkbox-item checked-item"><div class="cb checked">✓</div> Validación de comandos/config</div>
+  <div class="checkbox-item checked-item"><div class="cb checked">✓</div> Protección de información sensible</div>
+</div>
+
+<div class="leccion">
+  <div class="leccion-label">Lección aprendida</div>
+  <p>Me sorprende todo lo que se puede lograr en una sesión — un agente de contenido completo con marca, restricciones y variaciones por red. La IA no reemplaza el criterio de marca, pero lo ejecuta a velocidad imposible para un humano solo.</p>
+</div>
+
+<hr>
+
+<!-- ===== SEMANA 6 ===== -->
+<h2 id="s6">Semana 6 — Observabilidad moderna / AIOps en práctica</h2>
+
+<span class="field-label">¿Usaste IA para analizar logs, métricas o trazas, detectar anomalías, o correlacionar eventos de tu proyecto esta semana?</span>
+
+<blockquote><p>El pipeline de n8n está diseñado pero aún no está en producción, así que no tengo datos de telemetría propios del Growth Engine todavía. Sin embargo, apliqué los conceptos del módulo para diseñar la estrategia de observabilidad desde el inicio.</p></blockquote>
+
+<span class="field-label">Contexto que le diste a la IA</span>
+<div class="field-answer">Le pregunté: dado un pipeline de n8n con 4 fases (monitoreo → calificación IA → generación outreach → publicación), ¿qué métricas, logs y alertas debo diseñar desde el inicio para saber si está funcionando y dónde se rompe?</div>
+
+<span class="field-label">Problema o pregunta que trabajaste</span>
+<div class="field-answer">¿Cómo observo un pipeline que mezcla scraping (Apify), IA (Claude API) y publicación (Buffer)? Los tres tienen diferentes tipos de fallo: Apify puede no encontrar resultados, la IA puede devolver JSON malformado, y Buffer puede rechazar un post. ¿Cómo los distingo y alerto sobre cada uno sin perder ningún error?</div>
+
+<span class="field-label">Cómo usaste la IA</span>
+<div class="field-answer">Claude Code me ayudó a diseñar una estrategia de observabilidad para el pipeline con tres capas: (1) métricas de negocio (leads calificados por semana, score promedio, tasa de conversión de post), (2) métricas de operación (latencia por nodo en n8n, tasa de error por API), (3) alertas: fallo de Apify (0 resultados) → notificación WhatsApp; JSON inválido de Claude API → log + reintento; fallo de publicación → alerta email.</div>
+
+<span class="field-label">Cómo validaste lo que propuso</span>
+<div class="field-answer">Revisé que n8n tenga nodos de error handling nativos (sí los tiene: "Error Trigger" y "If" para validar respuestas). Confirmé que Claude API devuelve status codes estándar. El Google Sheets al final del pipeline actúa como el "log de negocio" que puedo revisar semanalmente para ver calidad de leads.</div>
+
+<span class="field-label">Qué acertó / qué falló la IA</span>
+<div class="field-answer">
+  <strong>Acertó:</strong> separar las métricas de negocio (¿funcionó para Zayfy?) de las operativas (¿funcionó el pipeline técnicamente?) es exactamente la diferencia entre SLO y alertas de infraestructura que vimos en la sesión de Prometheus.<br><br>
+  <strong>Aprendizaje:</strong> Si el entorno no genera suficiente telemetría, diseña el observability antes del primer deploy, no después de que falle en producción.
+</div>
+
+<span class="field-label">Habilidades practicadas esta semana</span>
+<div class="checkboxes">
+  <div class="checkbox-item"><div class="cb"></div> Contexto estructurado a la IA</div>
+  <div class="checkbox-item checked-item"><div class="cb checked">✓</div> Investigación antes de solución</div>
+  <div class="checkbox-item"><div class="cb"></div> Validación de comandos/config</div>
+  <div class="checkbox-item"><div class="cb"></div> Protección de información sensible</div>
+</div>
+
+<div class="leccion">
+  <div class="leccion-label">Lección aprendida</div>
+  <p>No solo crear un agente — diseñar cómo observarlo desde el día 1. Un pipeline sin métricas es un proceso ciego: no sabes si funciona hasta que un cliente se queja.</p>
+</div>
+
+<hr>
+
+<!-- ===== SEMANA 7 ===== -->
+<h2 id="s7">Semana 7 — Runbooks inteligentes / ChatOps con IA</h2>
+
+<span class="field-label">¿Generaste o probaste un runbook dinámico con IA, o usaste una interfaz conversacional (ChatOps) para ejecutar o coordinar alguna acción esta semana?</span>
+<div class="field-answer">Sí. Diseñé el flujo de <strong>aprobación por WhatsApp</strong> del pipeline de Zayfy como ChatOps: n8n genera el DM de outreach → WhatsApp Business notifica a Yasmín o Cristian con el mensaje propuesto → responden "SÍ" o "NO" → n8n actúa en consecuencia. Este es el guardrail humano del pipeline, implementado como ChatOps natural.</div>
+
+<span class="field-label">Contexto que le diste a la IA</span>
+<div class="field-answer">
+  <ul>
+    <li>El flujo de Fase 2 del Growth Engine: n8n llama a Claude, recibe el DM generado, debe esperar aprobación antes de enviar</li>
+    <li>El canal disponible: ya tenemos WhatsApp Business API configurado (para el Paquete Emprendedor)</li>
+    <li>Restricción crítica: nunca enviar un DM sin aprobación humana explícita — riesgo de spam y daño de reputación</li>
+    <li>Queremos que el flujo sea lo más simple posible: una sola pantalla en WhatsApp, respuesta con una palabra</li>
+  </ul>
+</div>
+
+<span class="field-label">Problema o pregunta que trabajaste</span>
+<div class="field-answer">¿Cómo implemento un punto de aprobación humana en el medio de un flujo automatizado de n8n sin que sea tedioso? Si el proceso de aprobación es incómodo, el humano lo desactiva y el pipeline corre sin control. El ChatOps tiene que sentirse natural, como aprobar un pago en la app del banco.</div>
+
+<span class="field-label">Cómo usaste la IA</span>
+<div class="field-answer">Claude Code me ayudó a diseñar el flujo completo con guardrails. El patrón: n8n genera el DM → envía a WhatsApp con el texto: "Propuesta de DM para @[handle] ([nicho]): '[mensaje generado]'. ¿Aprobar? Responde SÍ o NO." → webhook de WhatsApp escucha la respuesta → si SÍ: n8n programa el DM en el horario óptimo; si NO: lo descarta y registra por qué.</div>
+
+<span class="field-label">Cómo validaste lo que propuso</span>
+<div class="field-answer">Revisé la arquitectura de webhooks de WhatsApp Business API para confirmar que n8n puede escuchar respuestas (sí, con webhook + autenticación de token). El flujo teórico es correcto. No está implementado todavía — es parte del sprint de Semana 2 del mes siguiente.</div>
+
+<span class="field-label">Qué acertó / qué falló la IA</span>
+<div class="field-answer">
+  <strong>Acertó:</strong> identificar que el momento de aprobación debe ser lo más tarde posible en el flujo (justo antes de enviar, no al principio) para minimizar interrupciones sin perder control. También sugirió agregar el score del lead en el mensaje de aprobación para que yo pueda tomar la decisión con contexto.<br><br>
+  <strong>Para empezar no sabía lo que era ChatOps;</strong> ahora veo la utilidad y el montón de tiempo muerto que puede ahorrar en cualquier proceso que mezcla IA con decisión humana.
+</div>
+
+<span class="field-label">Habilidades practicadas esta semana</span>
+<div class="checkboxes">
+  <div class="checkbox-item checked-item"><div class="cb checked">✓</div> Contexto estructurado a la IA</div>
+  <div class="checkbox-item checked-item"><div class="cb checked">✓</div> Investigación antes de solución</div>
+  <div class="checkbox-item"><div class="cb"></div> Validación de comandos/config</div>
+  <div class="checkbox-item"><div class="cb"></div> Protección de información sensible</div>
+</div>
+
+<div class="leccion">
+  <div class="leccion-label">Lección aprendida</div>
+  <p>ChatOps no es solo ejecutar comandos por chat — es diseñar el momento exacto donde el humano decide, de forma que sea natural y no eludible. El guardrail más efectivo es el que no molesta.</p>
+</div>
+
+<hr>
+
+<!-- ===== SEMANA 8 ===== -->
+<h2 id="s8">Semana 8 — DevSecOps + IA responsable</h2>
+
+<span class="field-label">¿Revisaste implicaciones de seguridad de tu proyecto con ayuda de IA, o aplicaste principios de uso responsable esta semana?</span>
+<div class="field-answer">Sí. Revisé con IA las implicaciones de seguridad del Zayfy Growth Engine: qué datos maneja, dónde se podrían exponer credenciales, y qué principios de IA responsable aplican a un pipeline que contacta personas reales en redes sociales.</div>
+
+<span class="field-label">Contexto que le diste a la IA</span>
+<div class="field-answer">
+  <ul>
+    <li>El pipeline maneja: API key de Anthropic, token de Meta (WhatsApp), credenciales de Apify, acceso a Google Sheets</li>
+    <li>El Content Studio (Fase 1) tiene datos de marca de Zayfy en el browser, sin servidor</li>
+    <li>El pipeline de leads manejará perfiles públicos de Instagram/TikTok (datos de terceros)</li>
+    <li>El outreach generado va a personas reales — hay implicaciones éticas y legales</li>
+  </ul>
+</div>
+
+<span class="field-label">Problema o pregunta que trabajaste</span>
+<div class="field-answer">¿Dónde están los puntos de riesgo en el pipeline y cómo los mitigo? Específicamente: (1) dónde no poner tokens/claves, (2) cómo aseguro que el scraping de perfiles sea legal, (3) qué hace responsable el outreach automatizado sin que se convierta en spam.</div>
+
+<span class="field-label">Cómo usaste la IA</span>
+<div class="field-answer">Claude Code me ayudó a hacer un análisis de amenazas del pipeline y definir medidas concretas. También me hizo notar que hay una diferencia entre scraping de datos públicos (legal en la mayoría de jurisdicciones si no viola los ToS de la plataforma) y enviar mensajes masivos automatizados (que sí tiene restricciones específicas de Meta y TikTok).</div>
+
+<span class="field-label">Cómo validaste lo que propuso</span>
+<div class="field-answer">Revisé los Términos de Servicio de Meta para WhatsApp Business API y de TikTok for Developers: ambos permiten mensajes iniciados por el negocio con plantillas pre-aprobadas, pero con límites de volumen. Confirmé que el flujo de aprobación humana diseñado en Semana 7 es también el guardrail de responsabilidad: ningún mensaje se envía sin que yo lo haya leído.</div>
+
+<span class="field-label">Qué acertó / qué falló la IA</span>
+<div class="field-answer">
+  <strong>Acertó:</strong> identificar que el riesgo más alto no es técnico (exponer una API key) sino reputacional (que Zayfy sea percibida como spam). Un mensaje mal dirigido daña más que un token robado en este contexto. También acertó en recomendar que los tokens se guarden en variables de entorno de n8n, nunca en variables de texto en los nodos del workflow.<br><br>
+  <strong>Medidas aplicadas al Content Studio:</strong> el tool usa <code>localStorage</code> del browser — los leads se guardan localmente, nunca se envían a un servidor. Ningún dato de cliente pasa por APIs externas en la Fase 1.
+</div>
+
+<span class="field-label">Habilidades practicadas esta semana</span>
+<div class="checkboxes">
+  <div class="checkbox-item"><div class="cb"></div> Contexto estructurado a la IA</div>
+  <div class="checkbox-item"><div class="cb"></div> Investigación antes de solución</div>
+  <div class="checkbox-item"><div class="cb"></div> Validación de comandos/config</div>
+  <div class="checkbox-item checked-item"><div class="cb checked">✓</div> Protección de información sensible</div>
+</div>
+
+<div class="leccion">
+  <div class="leccion-label">Lección aprendida</div>
+  <p>Si le das demasiados permisos al agente puede hacer cosas más allá de lo que diseñas: nunca compartir tokens en texto plano, nunca dar acceso de escritura donde solo necesitas lectura, y siempre anonimizar la información sensible antes de pasarla al modelo.</p>
+</div>
+
+<hr>
+
+<!-- ===== CONSOLIDADO ===== -->
+<h2 id="consolidado">Consolidado — Proyecto Integrador (sesión 16)</h2>
+
+<h3>Problema (resumen final)</h3>
+<div class="field-answer">
+  Zayfy, una startup tech en Medellín, necesita encontrar clientes potenciales y producir contenido para redes sociales sin que eso consuma el tiempo de las dos fundadoras que también hacen el trabajo técnico. Hoy el proceso es manual: buscar cuentas a mano en Instagram/TikTok, escribir posts desde cero para cada red, hacer seguimiento en un chat de WhatsApp. Es inescalable. <strong>¿Cómo automatizamos la adquisición de clientes y la generación de contenido con IA, sin perder la voz de marca y manteniendo aprobación humana en los puntos críticos?</strong>
+</div>
+
+<h3>Evidencia del proyecto — Zayfy Growth Engine</h3>
+
+<div class="overflow-table">
+<table>
+  <thead><tr><th>Entregable</th><th>Descripción</th><th>Estado</th></tr></thead>
+  <tbody>
+    <tr>
+      <td>Zayfy Content Studio</td>
+      <td>Herramienta web con generador de posts para IG/TikTok/LinkedIn, banco de ideas, hashtags y mini-CRM de leads. Publicada como Artifact interactivo el 18 nov 2026.</td>
+      <td>✅ Hecho</td>
+    </tr>
+    <tr>
+      <td>Pipeline n8n — Fase 2-3</td>
+      <td>Arquitectura diseñada: monitoreo de hashtags (Apify) → calificación con Haiku → outreach con Sonnet → aprobación por WhatsApp → publicación con Buffer. Documentada en el Content Studio (tab "Pipeline n8n").</td>
+      <td>⚙️ Diseñado, pendiente implementar</td>
+    </tr>
+    <tr>
+      <td>Estrategia de observabilidad</td>
+      <td>Métricas de negocio + operativas + alertas para el pipeline. Google Sheets como log de negocio, n8n Error Trigger como log operativo.</td>
+      <td>⚙️ Diseñado</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<h3>Investigación asistida por IA (resumen del proceso)</h3>
+<div class="field-answer">
+  Usé Claude Code como harness principal durante todo el curso. El flujo consistente fue: (1) darle contexto estructurado del problema desde el skill <code>zayfy-negocio</code>, (2) pedirle que propusiera la solución con restricciones explícitas de marca, (3) revisar y ajustar los outputs, (4) validar en el browser o con cálculos manuales. El proceso nunca fue "pídele a la IA y listo" — siempre hubo un ciclo de revisión.
+</div>
+
+<h3>Hipótesis consideradas y descartadas</h3>
+<div class="field-answer">
+  <strong>Descartada:</strong> publicación automática sin aprobación humana. La IA genera buen contenido, pero sin revisión puede violar los ToS de Meta o enviar un post fuera de contexto en un día sensible. El riesgo reputacional para Zayfy es mayor que el beneficio de ahorrar 2 minutos de aprobación.<br><br>
+  <strong>Descartada:</strong> usar un solo modelo (Sonnet) para todo el pipeline. Caro e innecesario para clasificación de leads, que es una tarea de razonamiento simple. Haiku + Sonnet en sus roles correctos es la decisión correcta.<br><br>
+  <strong>Descartada:</strong> construir la herramienta de contenido con llamadas en tiempo real a la API desde el inicio. Para validar la herramienta y la voz de marca, es más rápido hacerlo con templates inteligentes primero, confirmar que los outputs son correctos, y conectar la API después.
+</div>
+
+<h3>Causa raíz del problema original</h3>
+<div class="field-answer">El tiempo de Zayfy está concentrado en entrega técnica. El marketing y la prospección se hacen "cuando hay tiempo", que en la práctica es casi nunca. La causa raíz no es falta de ideas o de habilidad — es que el proceso manual no es sostenible para dos personas que también son las que hacen el trabajo.</div>
+
+<h3>Solución propuesta</h3>
+<div class="project-summary">
+  <h3>Zayfy Growth Engine — 3 fases</h3>
+  <p><strong>Fase 1 (entregada):</strong> Content Studio como harness de generación de contenido. Reduce de 30 min a 2 min por post. Cero costo de API (templates locales). En producción desde 18 nov 2026.</p>
+  <p><strong>Fase 2 (diciembre 2026):</strong> Pipeline n8n para búsqueda y calificación de leads. Meta: 40 leads/semana calificados automáticamente, con aprobación humana antes de cualquier contacto.</p>
+  <p><strong>Fase 3 (enero 2027):</strong> Publicación semi-automática de contenido. n8n genera según calendario editorial, humano aprueba, Buffer publica. Meta: 3 posts/semana por red con 15 min de trabajo semanal total.</p>
+</div>
+
+<h3>Cómo se validaría en producción</h3>
+<div class="field-answer">
+  <strong>Fase 1:</strong> publicar 3 posts/semana durante 4 semanas con el Content Studio y medir engagement vs. posts escritos manualmente. Si el engagement es comparable (±20%), la herramienta está validada.<br><br>
+  <strong>Fase 2:</strong> correr el pipeline con 20 leads en la primera semana, revisar manualmente el 100% de los scores generados por Haiku, confirmar que el score ≥ 7 corresponde realmente a un prospecto válido. Ajustar el prompt si la precisión &lt; 70%.<br><br>
+  <strong>Fase 3:</strong> piloto de 2 semanas con publicación real. Si algún post genera un problema de marca, revisar el template y agregar la restricción al sistema.
+</div>
+
+<h3>Evaluación general de la IA como colaboradora</h3>
+<div class="field-answer">
+  Excelente para diseño de arquitecturas, generación de código estructurado y templates de contenido cuando tiene contexto rico. Necesitó corrección en el tono coloquial para TikTok (tendía a ser demasiado formal) y en los posts técnicos de Cloud Rescue para audiencias no-técnicas (hablaba de recursos y no de consecuencias de negocio).
+</div>
+
+<span class="field-label">¿Qué hizo bien de forma consistente? ¿Dónde tuviste que corregirla más seguido?</span>
+<div class="field-answer">
+  <strong>Consistentemente bien:</strong> respetar las restricciones de marca (nunca escribió "precio de lanzamiento", nunca prometió alcance), mantener coherencia arquitectural entre semanas (el diseño de Semana 3 era compatible con lo que construimos en Semana 2), y calcular costos de API con precisión.<br><br>
+  <strong>Correción más frecuente:</strong> ajustar el tono por audiencia — cada vez que el nicho era micronegocios informales (TikTok sellers, salones de belleza), la IA tendía a ser demasiado corporativa. Resuelto con contexto explícito ("habla como si le hablaras a tu vecina que tiene un salón de belleza").
+</div>
+
+<h3>Lo más valioso que aprendiste sobre colaborar con IA en DevOps</h3>
+<div class="field-answer">
+  Que la IA no va a reemplazar el criterio de arquitectura ni el conocimiento de marca — pero sí va a reemplazar el tiempo de ejecución. Pasé de tener una idea (automatizar adquisición de clientes) a tener una herramienta funcional y una arquitectura de pipeline en un curso. Eso no era posible antes. <strong>El recurso escaso ya no es la capacidad de construir; es el criterio de qué vale la pena construir.</strong>
+</div>
+
+<hr>
+
+<p style="font-size:13px; color: var(--fg-dim); text-align:center; margin-top:8px;">
+  Bitácora — AI-Driven DevOps Accelerator · Zayfy · Noviembre 2026
+</p>
+
+</div>
+</body>
+</html>

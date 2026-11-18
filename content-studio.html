@@ -1,0 +1,1220 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Zayfy Content Studio</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;450;500&display=swap">
+<style>
+/* === TOKENS === */
+/* Layout: sidebar nav + main content, single-column on mobile */
+:root {
+  --bg: #0a0c10;
+  --bg-2: #111318;
+  --bg-3: #181c24;
+  --border: rgba(255,255,255,0.08);
+  --fg: #e8eaf0;
+  --fg-muted: #8891a4;
+  --fg-dim: #4a5468;
+  --accent: #6e56ff;
+  --accent-glow: rgba(110,86,255,0.18);
+  --accent-2: #00d4a0;
+  --tiktok: #ff2d55;
+  --ig: #e1306c;
+  --linkedin: #0a66c2;
+  --linkedin-soft: #1a76d2;
+  --warn: #f59e0b;
+  --radius: 10px;
+  --radius-sm: 6px;
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    --bg: #f5f6fa;
+    --bg-2: #ffffff;
+    --bg-3: #eef0f6;
+    --border: rgba(0,0,0,0.09);
+    --fg: #0d1117;
+    --fg-muted: #5a6376;
+    --fg-dim: #a0aab8;
+    --accent: #5a44f0;
+    --accent-glow: rgba(90,68,240,0.1);
+    --accent-2: #00a884;
+    color-scheme: light;
+  }
+}
+:root[data-theme="light"] {
+  --bg: #f5f6fa;
+  --bg-2: #ffffff;
+  --bg-3: #eef0f6;
+  --border: rgba(0,0,0,0.09);
+  --fg: #0d1117;
+  --fg-muted: #5a6376;
+  --fg-dim: #a0aab8;
+  --accent: #5a44f0;
+  --accent-glow: rgba(90,68,240,0.1);
+  --accent-2: #00a884;
+  color-scheme: light;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-bottom: max(16px, env(safe-area-inset-bottom, 0px));
+  min-height: 100%;
+}
+
+/* === HEADER === */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 0 14px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 24px;
+  gap: 12px;
+}
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.logo-mark {
+  width: 32px; height: 32px;
+  background: var(--accent);
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700; font-size: 16px;
+  color: #fff; letter-spacing: -0.5px;
+  flex-shrink: 0;
+}
+.logo-text {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700; font-size: 17px;
+  color: var(--fg); letter-spacing: -0.3px;
+}
+.logo-sub {
+  font-size: 11px; color: var(--fg-muted);
+  letter-spacing: 0.04em; text-transform: uppercase;
+  margin-top: 1px;
+}
+.header-actions { display: flex; gap: 8px; align-items: center; }
+.theme-btn {
+  background: var(--bg-3); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); padding: 6px 10px;
+  color: var(--fg-muted); font-size: 13px; cursor: pointer;
+  transition: color .2s, background .2s;
+}
+.theme-btn:hover { color: var(--fg); background: var(--bg-2); }
+
+/* === LAYOUT === */
+.layout {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 20px;
+  align-items: start;
+}
+@media (max-width: 700px) {
+  .layout { grid-template-columns: 1fr; }
+  .sidebar { display: flex; flex-wrap: wrap; gap: 6px; }
+}
+
+/* === SIDEBAR === */
+.sidebar { display: flex; flex-direction: column; gap: 4px; }
+.nav-label {
+  font-size: 10px; font-weight: 600; letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--fg-dim);
+  padding: 10px 10px 4px;
+}
+.nav-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 10px; border-radius: var(--radius-sm);
+  cursor: pointer; color: var(--fg-muted);
+  font-size: 13.5px; font-weight: 500;
+  transition: all .15s; border: 1px solid transparent;
+  user-select: none;
+}
+.nav-item:hover { background: var(--bg-2); color: var(--fg); }
+.nav-item.active {
+  background: var(--accent-glow); color: var(--accent);
+  border-color: rgba(110,86,255,0.2);
+}
+.nav-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: currentColor; opacity: 0.5; flex-shrink: 0;
+}
+.nav-item.active .nav-dot { opacity: 1; }
+@media (max-width: 700px) {
+  .nav-item { padding: 7px 12px; border: 1px solid var(--border); }
+  .nav-label { display: none; }
+}
+
+/* === MAIN PANEL === */
+.panel { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+
+/* === SECTION CARDS === */
+.card {
+  background: var(--bg-2); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 18px 20px;
+}
+.card-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 13px; font-weight: 600; letter-spacing: 0.03em;
+  color: var(--fg-muted); text-transform: uppercase;
+  margin-bottom: 12px;
+}
+
+/* === NETWORK TABS === */
+.network-tabs {
+  display: flex; gap: 6px; flex-wrap: wrap;
+}
+.net-btn {
+  display: flex; align-items: center; gap: 7px;
+  padding: 8px 14px; border-radius: var(--radius-sm);
+  border: 1px solid var(--border); background: var(--bg-3);
+  cursor: pointer; font-size: 13px; font-weight: 500;
+  color: var(--fg-muted); transition: all .15s;
+}
+.net-btn:hover { border-color: var(--fg-dim); color: var(--fg); }
+.net-btn.active-ig { background: rgba(225,48,108,0.12); border-color: rgba(225,48,108,0.35); color: var(--ig); }
+.net-btn.active-tk { background: rgba(255,45,85,0.1); border-color: rgba(255,45,85,0.3); color: var(--tiktok); }
+.net-btn.active-li { background: rgba(10,102,194,0.1); border-color: rgba(10,102,194,0.3); color: var(--linkedin-soft); }
+.net-icon { font-size: 15px; }
+
+/* === SERVICE GRID === */
+.service-grid {
+  display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px;
+}
+@media (max-width: 500px) { .service-grid { grid-template-columns: 1fr; } }
+.service-btn {
+  padding: 11px 14px; border-radius: var(--radius-sm);
+  border: 1px solid var(--border); background: var(--bg-3);
+  cursor: pointer; text-align: left;
+  transition: all .15s;
+}
+.service-btn:hover { border-color: var(--fg-dim); }
+.service-btn.active {
+  border-color: var(--accent); background: var(--accent-glow);
+}
+.service-name {
+  font-weight: 600; font-size: 13px; color: var(--fg);
+  margin-bottom: 2px;
+}
+.service-desc { font-size: 11.5px; color: var(--fg-muted); line-height: 1.4; }
+.service-btn.active .service-name { color: var(--accent); }
+
+/* === FORMAT CHIPS === */
+.format-chips { display: flex; gap: 6px; flex-wrap: wrap; }
+.chip {
+  padding: 5px 12px; border-radius: 20px;
+  border: 1px solid var(--border); background: var(--bg-3);
+  cursor: pointer; font-size: 12.5px; color: var(--fg-muted);
+  transition: all .15s;
+}
+.chip:hover { border-color: var(--fg-dim); color: var(--fg); }
+.chip.active {
+  background: var(--accent-glow); border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* === GOAL & AUDIENCE === */
+.form-row { display: flex; flex-direction: column; gap: 6px; }
+.form-label { font-size: 12px; font-weight: 500; color: var(--fg-muted); }
+.form-input, .form-select, .form-textarea {
+  background: var(--bg-3); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); padding: 9px 12px;
+  color: var(--fg); font-size: 13.5px; font-family: inherit;
+  transition: border-color .15s; resize: vertical;
+  min-width: 0;
+}
+.form-input:focus, .form-select:focus, .form-textarea:focus {
+  outline: none; border-color: var(--accent);
+}
+.form-textarea { min-height: 72px; }
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+@media (max-width: 500px) { .form-grid { grid-template-columns: 1fr; } }
+
+/* === GENERATE BUTTON === */
+.gen-btn {
+  width: 100%; padding: 13px 20px;
+  background: var(--accent); border: none; border-radius: var(--radius-sm);
+  color: #fff; font-family: 'Space Grotesk', sans-serif;
+  font-size: 15px; font-weight: 600; cursor: pointer;
+  transition: opacity .15s, transform .1s;
+  letter-spacing: -0.2px;
+}
+.gen-btn:hover { opacity: 0.9; }
+.gen-btn:active { transform: scale(0.99); }
+.gen-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* === OUTPUT === */
+.output-area { position: relative; }
+.output-box {
+  background: var(--bg-3); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); padding: 16px;
+  min-height: 120px; font-size: 14px; line-height: 1.7;
+  color: var(--fg); white-space: pre-wrap;
+  word-break: break-word;
+}
+.output-box.empty { color: var(--fg-dim); font-style: italic; }
+.output-actions {
+  display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap;
+}
+.action-btn {
+  padding: 7px 14px; border-radius: var(--radius-sm);
+  border: 1px solid var(--border); background: var(--bg-3);
+  color: var(--fg-muted); font-size: 12.5px; cursor: pointer;
+  transition: all .15s; display: flex; align-items: center; gap: 6px;
+}
+.action-btn:hover { color: var(--fg); border-color: var(--fg-dim); }
+.action-btn.copied { color: var(--accent-2); border-color: var(--accent-2); }
+
+/* === VARIATIONS === */
+.variations-grid {
+  display: grid; grid-template-columns: 1fr;
+  gap: 10px; margin-top: 12px;
+}
+.variation-card {
+  background: var(--bg-3); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); padding: 14px 16px;
+  cursor: pointer; transition: border-color .15s;
+  position: relative;
+}
+.variation-card:hover { border-color: var(--accent); }
+.variation-label {
+  font-size: 11px; font-weight: 600; letter-spacing: 0.06em;
+  text-transform: uppercase; color: var(--fg-dim);
+  margin-bottom: 8px; display: flex; align-items: center; gap: 8px;
+}
+.variation-text { font-size: 13.5px; line-height: 1.65; color: var(--fg); white-space: pre-wrap; }
+.copy-var {
+  position: absolute; top: 10px; right: 10px;
+  padding: 3px 8px; border-radius: 4px;
+  background: var(--bg-2); border: 1px solid var(--border);
+  color: var(--fg-muted); font-size: 11px; cursor: pointer;
+  opacity: 0; transition: opacity .15s;
+}
+.variation-card:hover .copy-var { opacity: 1; }
+
+/* === IDEAS TAB === */
+.ideas-section { display: flex; flex-direction: column; gap: 14px; }
+.idea-category {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 14px; font-weight: 600; color: var(--fg);
+  margin-bottom: 8px;
+}
+.idea-list { display: flex; flex-direction: column; gap: 6px; }
+.idea-item {
+  display: flex; gap: 10px; align-items: flex-start;
+  padding: 10px 14px; border-radius: var(--radius-sm);
+  background: var(--bg-3); border: 1px solid var(--border);
+  cursor: pointer; transition: border-color .15s;
+}
+.idea-item:hover { border-color: var(--accent); }
+.idea-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+.idea-content { min-width: 0; }
+.idea-title { font-weight: 500; font-size: 13.5px; color: var(--fg); }
+.idea-hint { font-size: 12px; color: var(--fg-muted); margin-top: 2px; }
+.net-badge {
+  display: inline-flex; align-items: center;
+  padding: 2px 7px; border-radius: 10px;
+  font-size: 10.5px; font-weight: 600;
+  margin-left: 6px; vertical-align: middle;
+}
+.badge-ig { background: rgba(225,48,108,0.12); color: var(--ig); }
+.badge-tk { background: rgba(255,45,85,0.1); color: var(--tiktok); }
+.badge-li { background: rgba(10,102,194,0.1); color: var(--linkedin-soft); }
+
+/* === LEADS TAB === */
+.leads-section { display: flex; flex-direction: column; gap: 14px; }
+.leads-form { display: flex; gap: 8px; flex-wrap: wrap; }
+.leads-form .form-input { flex: 1; min-width: 150px; }
+.add-btn {
+  padding: 9px 16px; background: var(--accent);
+  border: none; border-radius: var(--radius-sm);
+  color: #fff; font-weight: 600; font-size: 13px;
+  cursor: pointer; white-space: nowrap;
+}
+.lead-list { display: flex; flex-direction: column; gap: 8px; }
+.lead-card {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 14px; border-radius: var(--radius-sm);
+  background: var(--bg-3); border: 1px solid var(--border);
+}
+.lead-avatar {
+  width: 36px; height: 36px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 14px; flex-shrink: 0;
+}
+.lead-info { flex: 1; min-width: 0; }
+.lead-handle { font-weight: 600; font-size: 13.5px; }
+.lead-meta { font-size: 12px; color: var(--fg-muted); margin-top: 2px; }
+.lead-status {
+  padding: 3px 10px; border-radius: 20px;
+  font-size: 11.5px; font-weight: 600;
+  white-space: nowrap;
+}
+.status-nuevo { background: rgba(110,86,255,0.15); color: var(--accent); }
+.status-contactado { background: rgba(0,212,160,0.12); color: var(--accent-2); }
+.status-seguimiento { background: rgba(245,158,11,0.12); color: var(--warn); }
+.lead-delete {
+  background: none; border: none;
+  color: var(--fg-dim); cursor: pointer; font-size: 16px;
+  padding: 2px 6px; border-radius: 4px;
+  transition: color .15s;
+}
+.lead-delete:hover { color: var(--tiktok); }
+.empty-leads {
+  text-align: center; padding: 32px 16px;
+  color: var(--fg-dim); font-size: 13px;
+}
+
+/* === HASHTAG TAB === */
+.hashtag-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 12px;
+}
+.hashtag-category { margin-bottom: 14px; }
+.hashtag-list { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.hashtag-pill {
+  padding: 4px 11px; border-radius: 20px;
+  background: var(--bg-3); border: 1px solid var(--border);
+  font-size: 12.5px; color: var(--fg-muted); cursor: pointer;
+  transition: all .15s;
+}
+.hashtag-pill:hover { border-color: var(--accent); color: var(--accent); }
+.hashtag-pill.copied-ht { background: var(--accent-glow); border-color: var(--accent); color: var(--accent); }
+
+/* === SPINNER === */
+@keyframes spin { to { transform: rotate(360deg); } }
+.spinner {
+  width: 18px; height: 18px; border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: #fff; border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  display: inline-block;
+}
+
+/* === TOAST === */
+.toast {
+  position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+  background: var(--bg-2); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); padding: 10px 20px;
+  font-size: 13.5px; color: var(--fg);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+  z-index: 100; opacity: 0; transition: opacity .2s;
+  pointer-events: none; white-space: nowrap;
+}
+.toast.show { opacity: 1; }
+
+/* === SECTION VISIBILITY === */
+.tab-content { display: none; }
+.tab-content.active { display: flex; flex-direction: column; gap: 16px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo">
+    <div class="logo-mark">Z</div>
+    <div>
+      <div class="logo-text">Zayfy Content Studio</div>
+      <div class="logo-sub">IG · TikTok · LinkedIn</div>
+    </div>
+  </div>
+  <div class="header-actions">
+    <button class="theme-btn" onclick="toggleTheme()">◐ Tema</button>
+  </div>
+</div>
+
+<div class="layout">
+  <!-- SIDEBAR NAV -->
+  <nav class="sidebar">
+    <div class="nav-label">Herramientas</div>
+    <div class="nav-item active" onclick="showTab('generator', this)">
+      <span class="nav-dot"></span> Generador
+    </div>
+    <div class="nav-item" onclick="showTab('ideas', this)">
+      <span class="nav-dot"></span> Ideas de Contenido
+    </div>
+    <div class="nav-item" onclick="showTab('hashtags', this)">
+      <span class="nav-dot"></span> Hashtags
+    </div>
+    <div class="nav-item" onclick="showTab('leads', this)">
+      <span class="nav-dot"></span> Leads
+    </div>
+    <div class="nav-label">Automatización</div>
+    <div class="nav-item" onclick="showTab('pipeline', this)">
+      <span class="nav-dot"></span> Pipeline n8n
+    </div>
+  </nav>
+
+  <!-- MAIN PANEL -->
+  <main class="panel">
+
+    <!-- ======== TAB: GENERADOR ======== -->
+    <div id="tab-generator" class="tab-content active">
+
+      <div class="card">
+        <div class="card-title">Red Social</div>
+        <div class="network-tabs">
+          <button class="net-btn active-ig" data-net="ig" onclick="selectNet(this)">
+            <span class="net-icon">📸</span> Instagram
+          </button>
+          <button class="net-btn" data-net="tk" onclick="selectNet(this)">
+            <span class="net-icon">🎵</span> TikTok
+          </button>
+          <button class="net-btn" data-net="li" onclick="selectNet(this)">
+            <span class="net-icon">💼</span> LinkedIn
+          </button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Servicio de Zayfy</div>
+        <div class="service-grid">
+          <button class="service-btn active" data-svc="emprendedor" onclick="selectSvc(this)">
+            <div class="service-name">Paquete Emprendedor</div>
+            <div class="service-desc">Vitrina web, automatización, asistente IA para micronegocios</div>
+          </button>
+          <button class="service-btn" data-svc="devops" onclick="selectSvc(this)">
+            <div class="service-name">DevOps Partner</div>
+            <div class="service-desc">CI/CD, IaC, contenedores, monitoreo continuo</div>
+          </button>
+          <button class="service-btn" data-svc="cloud" onclick="selectSvc(this)">
+            <div class="service-name">Cloud Rescue</div>
+            <div class="service-desc">Recuperar, estabilizar y optimizar cloud/AWS</div>
+          </button>
+          <button class="service-btn" data-svc="ai" onclick="selectSvc(this)">
+            <div class="service-name">AI & Automation</div>
+            <div class="service-desc">Chatbots, WhatsApp, agentes, automatización</div>
+          </button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Formato</div>
+        <div class="format-chips" id="format-chips">
+          <!-- Se llena por JS según la red -->
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Contexto</div>
+        <div class="form-grid">
+          <div class="form-row">
+            <label class="form-label">Nicho / Audiencia</label>
+            <select class="form-select" id="audience">
+              <option value="tienda-tiktok">Vendedores en TikTok</option>
+              <option value="belleza">Salones de belleza y estética</option>
+              <option value="restaurante">Restaurantes y comida</option>
+              <option value="moda">Moda y accesorios</option>
+              <option value="startup">Startup / empresa tech</option>
+              <option value="ecommerce">E-commerce en crecimiento</option>
+              <option value="general">General / cualquier negocio</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <label class="form-label">Objetivo del post</label>
+            <select class="form-select" id="goal">
+              <option value="awareness">Dar a conocer Zayfy</option>
+              <option value="problem">Mostrar un problema común</option>
+              <option value="solucion">Presentar una solución</option>
+              <option value="caso">Caso de éxito / resultado</option>
+              <option value="tip">Consejo o truco útil</option>
+              <option value="cta">Llamado a acción directo</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row" style="margin-top:12px;">
+          <label class="form-label">Contexto extra (opcional) — ej: "para una peluquería en Medellín"</label>
+          <textarea class="form-textarea" id="extra-context" placeholder="Agrega detalles específicos para personalizar el post..."></textarea>
+        </div>
+      </div>
+
+      <button class="gen-btn" id="gen-btn" onclick="generateContent()">
+        ✦ Generar contenido
+      </button>
+
+      <div class="card output-area" id="output-card" style="display:none;">
+        <div class="card-title" id="output-title">Post generado</div>
+        <div class="output-box" id="output-box"></div>
+        <div class="output-actions">
+          <button class="action-btn" id="copy-btn" onclick="copyOutput()">
+            📋 Copiar
+          </button>
+          <button class="action-btn" onclick="regenerate()">
+            🔄 Otra versión
+          </button>
+          <button class="action-btn" onclick="saveToLeads()">
+            ⭐ Guardar idea
+          </button>
+        </div>
+        <div class="variations-grid" id="variations-container"></div>
+      </div>
+
+    </div><!-- /tab-generator -->
+
+
+    <!-- ======== TAB: IDEAS ======== -->
+    <div id="tab-ideas" class="tab-content">
+      <div class="card">
+        <div class="card-title">Ideas de Contenido por Servicio</div>
+        <div class="ideas-section" id="ideas-list"></div>
+      </div>
+    </div>
+
+
+    <!-- ======== TAB: HASHTAGS ======== -->
+    <div id="tab-hashtags" class="tab-content">
+      <div class="card">
+        <div class="card-title">Hashtags por categoría — clic para copiar</div>
+        <div id="hashtag-content"></div>
+      </div>
+    </div>
+
+
+    <!-- ======== TAB: LEADS ======== -->
+    <div id="tab-leads" class="tab-content">
+      <div class="card">
+        <div class="card-title">Leads potenciales</div>
+        <div class="leads-form">
+          <input class="form-input" id="lead-handle" placeholder="@cuenta o nombre del negocio" />
+          <select class="form-select" id="lead-net" style="max-width:120px;">
+            <option value="ig">Instagram</option>
+            <option value="tk">TikTok</option>
+            <option value="li">LinkedIn</option>
+          </select>
+          <select class="form-select" id="lead-niche" style="max-width:150px;">
+            <option value="Tienda TikTok">Tienda TikTok</option>
+            <option value="Belleza">Belleza</option>
+            <option value="Restaurante">Restaurante</option>
+            <option value="Moda">Moda</option>
+            <option value="Tech/Startup">Tech/Startup</option>
+            <option value="Otro">Otro</option>
+          </select>
+          <button class="add-btn" onclick="addLead()">+ Agregar</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Lista de leads</div>
+        <div class="lead-list" id="lead-list"></div>
+      </div>
+    </div>
+
+
+    <!-- ======== TAB: PIPELINE ======== -->
+    <div id="tab-pipeline" class="tab-content">
+      <div class="card">
+        <div class="card-title">Pipeline de automatización — n8n + Claude API</div>
+        <div style="display:flex; flex-direction:column; gap:14px;">
+
+          <div style="background:var(--bg-3); border:1px solid var(--border); border-radius:var(--radius-sm); padding:16px;">
+            <div style="font-family:'Space Grotesk',sans-serif; font-weight:600; margin-bottom:8px;">
+              Fase 1 · Monitoreo de Hashtags
+            </div>
+            <div style="font-size:13px; color:var(--fg-muted); line-height:1.7;">
+              <strong>Objetivo:</strong> Encontrar cuentas que pueden ser clientes de Zayfy.<br>
+              <strong>Herramientas:</strong> n8n + Apify (scraping de IG/TikTok) o RapidAPI TikTok<br>
+              <strong>Hashtags a monitorear:</strong><br>
+              <code style="background:var(--bg-2); padding:2px 6px; border-radius:4px; font-size:12px; display:block; margin-top:6px; line-height:2;">
+                #tiendaonline #vendoporinsta #tiktokshop #negocioscolombia #emprendimientocol #quieromitienda #venderportiktok #ecommercecol #negociodigital #páginavweb
+              </code>
+            </div>
+          </div>
+
+          <div style="background:var(--bg-3); border:1px solid var(--border); border-radius:var(--radius-sm); padding:16px;">
+            <div style="font-family:'Space Grotesk',sans-serif; font-weight:600; margin-bottom:8px;">
+              Fase 2 · Calificación con IA
+            </div>
+            <div style="font-size:13px; color:var(--fg-muted); line-height:1.7;">
+              n8n llama a Claude API con el perfil de la cuenta.<br>
+              <strong>Prompt base:</strong><br>
+              <div style="background:var(--bg-2); padding:10px; border-radius:6px; margin-top:6px; font-size:12px; line-height:1.6; color:var(--fg); font-style:italic;">
+                "Evalúa si esta cuenta de [Red] es un cliente potencial para una agencia tech que hace páginas web y automatizaciones para micronegocios latinoamericanos. Cuenta: [handle], Descripción: [bio], Seguidores: [n]. Responde JSON: { score: 1-10, razon: '...', nicho: '...' }"
+              </div>
+            </div>
+          </div>
+
+          <div style="background:var(--bg-3); border:1px solid var(--border); border-radius:var(--radius-sm); padding:16px;">
+            <div style="font-family:'Space Grotesk',sans-serif; font-weight:600; margin-bottom:8px;">
+              Fase 3 · Generación de Outreach
+            </div>
+            <div style="font-size:13px; color:var(--fg-muted); line-height:1.7;">
+              Para leads con score ≥ 7, Claude genera un mensaje de DM personalizado.<br>
+              n8n guarda en Google Sheets / Notion y te notifica por WhatsApp para aprobar antes de enviar.
+            </div>
+          </div>
+
+          <div style="background:var(--bg-3); border:1px solid var(--border); border-radius:var(--radius-sm); padding:16px;">
+            <div style="font-family:'Space Grotesk',sans-serif; font-weight:600; margin-bottom:8px;">
+              Fase 4 · Publicación automática de contenido
+            </div>
+            <div style="font-size:13px; color:var(--fg-muted); line-height:1.7;">
+              n8n schedule (lun/mié/vie 9am) → Claude API genera post según calendario → Buffer/Later API → notifica para aprobar o publica directo.<br><br>
+              <strong>Herramientas recomendadas:</strong><br>
+              • Publicación: Buffer API, Later, o Meta Content Publishing API<br>
+              • n8n self-hosted (ya lo conoces) o n8n Cloud<br>
+              • Apify para scraping de TikTok/IG (plan gratuito disponible)<br>
+              • Claude API: Sonnet para generación, Haiku para calificación (costo bajo)
+            </div>
+          </div>
+
+          <div style="text-align:center; padding:12px;">
+            <div style="font-size:12px; color:var(--fg-dim);">
+              Costo estimado de IA por semana (40 leads + 3 posts): ~USD 0.50–1.50 con Haiku + Sonnet
+            </div>
+          </div>
+        </div>
+      </div>
+    </div><!-- /tab-pipeline -->
+
+  </main>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ===== STATE =====
+let selectedNet = 'ig';
+let selectedSvc = 'emprendedor';
+let selectedFormat = '';
+let leads = [];
+try { leads = JSON.parse(localStorage.getItem('zayfy_leads') || '[]'); } catch(e) {}
+let savedIdeas = [];
+try { savedIdeas = JSON.parse(localStorage.getItem('zayfy_ideas') || '[]'); } catch(e) {}
+
+// ===== DATA =====
+const formats = {
+  ig: ['Carrusel educativo', 'Reel / video corto', 'Post de imagen', 'Story interactiva', 'Post de texto'],
+  tk: ['Video tutorial', 'Dueto / respuesta', 'Video de problema', 'TikTok de resultado', 'Trend adaptado'],
+  li: ['Post reflexivo', 'Carrusel PDF', 'Artículo corto', 'Caso de estudio', 'Dato + pregunta']
+};
+
+const networkNames = { ig: 'Instagram', tk: 'TikTok', li: 'LinkedIn' };
+const networkIcons = { ig: '📸', tk: '🎵', li: '💼' };
+
+const svcData = {
+  emprendedor: {
+    name: 'Paquete Emprendedor',
+    emoji: '🛍️',
+    tags: ['#tiendaonline', '#negociocolombia', '#emprendedor']
+  },
+  devops: {
+    name: 'DevOps Partner',
+    emoji: '⚙️',
+    tags: ['#devops', '#cicd', '#infraestructura']
+  },
+  cloud: {
+    name: 'Cloud Rescue',
+    emoji: '☁️',
+    tags: ['#aws', '#cloud', '#cloudrescue']
+  },
+  ai: {
+    name: 'AI & Automation',
+    emoji: '🤖',
+    tags: ['#ia', '#automatizacion', '#whatsappbot']
+  }
+};
+
+const audienceNames = {
+  'tienda-tiktok': 'vendedores en TikTok',
+  'belleza': 'salones de belleza',
+  'restaurante': 'restaurantes',
+  'moda': 'tiendas de moda',
+  'startup': 'startups tech',
+  'ecommerce': 'e-commerce en crecimiento',
+  'general': 'emprendedores'
+};
+
+// ===== TEMPLATES DE CONTENIDO =====
+const contentTemplates = {
+  ig: {
+    emprendedor: {
+      awareness: [
+        `¿Sigues respondiendo "escríbeme al DM" para cada pedido? 📱\n\nTu negocio merece más que eso.\n\nCon Zayfy armamos tu tienda en 3 días:\n✅ Hasta 60 productos con fotos\n✅ Botón directo a WhatsApp con el pedido escrito\n✅ Los pedidos se guardan solos en una hoja\n✅ Link de pago incluido\n\nTus clientes compran aunque estés dormida. 💜\n\nEscríbenos y te mostramos cómo queda antes de que pagues. 👇\n\n#tiendaonline #negocioscolombia #emprendedorcol #venderporinternet`,
+        `De "mándame foto por WhatsApp" a tienda profesional 🛍️\n\nEso hace Zayfy en 7 días.\n\nTu negocio empieza a vender en serio cuando:\n→ Tienes una web con tus productos\n→ Los pedidos llegan organizados\n→ Cobras online sin complicarte\n→ El inventario se actualiza solo\n\nBeyond Code. Beyond Limits. ✨\n\n👇 ¿Cuál es tu negocio? Cuéntanos en los comentarios.`
+      ],
+      problem: [
+        `El problema de vender solo por Instagram 👇\n\n❌ Pierdes clientes que no te escriben\n❌ Los pedidos se mezclan en el chat\n❌ No sabes cuánto vendiste esta semana\n❌ Cuando no respondes, pierdes la venta\n\nUna tienda propia lo resuelve todo.\n\nY no cuesta lo que crees. 👀\n\nComenta "INFO" y te contamos cuánto. 💬\n\n#emprendimientocol #tiendavirtual #negociodigital #venderporinternet`
+      ],
+      solucion: [
+        `Tu tienda en 3 días. Miras antes de pagar. 💜\n\nAquí lo que incluye el plan Despegue de Zayfy:\n\n📌 Mini-sitio con hasta 20 productos\n📌 Botón de WhatsApp con mensaje escrito\n📌 WhatsApp Business configurado\n📌 QR para tu local\n📌 Capacitación de 1 hora\n📌 15 días de soporte\n\nInversión: $600.000 COP (pago en 2 cuotas)\n\n¿Tu negocio está listo para el siguiente nivel? 🚀\n\nEscríbenos → zay-fy.com | WA +57 312 815 8689`
+      ],
+      cta: [
+        `¿Tienes negocio en Instagram o TikTok? 📲\n\nTe mostramos tu tienda armada en 24 horas, con 3 productos de los tuyos.\n\nSin compromiso. Sin pagar nada todavía.\n\n👉 Escríbenos "QUIERO VER" al +57 312 815 8689\n\n#tiendaonline #negocioscolombia #zayfy`
+      ]
+    },
+    ai: {
+      awareness: [
+        `¿Y si tu WhatsApp vendiera solo mientras duermes? 🤖💬\n\nZayfy instala un asistente con IA en tu WhatsApp Business que:\n\n✅ Responde preguntas 24/7\n✅ Toma pedidos completos\n✅ Cobra y confirma\n✅ Pasa a humano cuando hay que negociar\n\nTus clientes felices. Tú descansando. 💜\n\nAplica para cualquier negocio con más de 50 mensajes al día.\n\n¿El tuyo aplica? Coméntanos 👇`
+      ],
+      tip: [
+        `3 cosas que tu asistente de IA puede hacer en WhatsApp 🤖\n\n1️⃣ Responder preguntas frecuentes a las 2am\n2️⃣ Tomar un pedido completo sin que tú intervengas\n3️⃣ Recordarle a quien no compró que aún puede hacerlo\n\nEsto ya existe. Ya funciona. Y no es tan caro como crees.\n\nEn Zayfy lo hacemos realidad para tu negocio. 💜\n\n#automatizacion #whatsappbusiness #inteligenciaartificial #negociosdigitales`
+      ]
+    },
+    cloud: {
+      problem: [
+        `¿Tu sistema en la nube está costando el doble de lo que debería? ☁️\n\nPasa más seguido de lo que crees.\n\nAWSs sin revisar, recursos encendidos sin usar, configuraciones que quedaron del lanzamiento y nunca se optimizaron.\n\nCloud Rescue de Zayfy:\n→ Revisamos todo en 3 días\n→ Informe claro de qué está fallando\n→ Arreglamos lo urgente en las primeras 2h\n→ Si contratas otro servicio, descontamos los $300.000\n\nSin jerigonza. Sin letra pequeña.\n\n📩 connect@zay-fy.com`
+      ]
+    },
+    devops: {
+      awareness: [
+        `¿Cuánto tiempo pierde tu equipo en deploys manuales? ⚙️\n\nCada deploy manual es un punto de falla.\n\nZayfy implementa CI/CD, IaC y monitoreo para que:\n\n✅ Los deploys sean automáticos y seguros\n✅ Los errores se detecten antes de llegar a producción\n✅ El equipo se enfoque en construir, no en apagar incendios\n\nBeyond Code. Beyond Limits. 🚀\n\n¿Tu equipo sigue desplegando a mano? 👇`
+      ]
+    }
+  },
+  tk: {
+    emprendedor: {
+      problem: [
+        `POV: Alguien te escribe "¿Tienes catálogo?" y tienes que buscar 20 fotos en el celular 😅\n\n¿Te pasa esto?\n\n👇 Comenta SÍ si ya es hora de tener tu propia tienda\n\n#emprendedorcol #negociotiktok #tiktokshop #tiendaonline #crecimientonegocio`,
+        `Stitch esto si vendes por TikTok y aún no tienes web 📲\n\n3 ventas que pierdes cada semana sin tienda propia:\n1. El que no se anima a escribir\n2. El que escribe cuando ya dormiste\n3. El que quiere pagar pero no sabe cómo\n\nZayfy te lo arma en 3 días 💜\n\n#vendoporinsta #negocioscolombia #emprendedortiktok`
+      ],
+      solucion: [
+        `Del DM al carrito en 3 días ⚡\n\nAsí queda tu tienda con Zayfy:\n\n✅ Web con tus productos\n✅ Botón de WhatsApp directo\n✅ Cobros online\n✅ Pedidos organizados automáticamente\n\nLink en bio 👆\n\n#tiendaonline #negocioscolombia #zayfy #automatizacion`
+      ]
+    },
+    ai: {
+      tip: [
+        `¿Sabías que puedes tener un empleado que nunca duerme? 🤖\n\nAI en WhatsApp Business:\n• Responde 24/7\n• Toma pedidos\n• Cobra automáticamente\n• Te pasa los casos difíciles\n\n¿Cuánto crees que cuesta? Comenta y te digo 👇\n\n#ia #automatizacion #whatsappbusiness #negociodigital`
+      ]
+    }
+  },
+  li: {
+    devops: {
+      awareness: [
+        `La automatización del pipeline no es un lujo. Es la diferencia entre escalar y atascarse.\n\nEn Zayfy hemos visto equipos que pasan el 30% de su tiempo en tareas que un CI/CD bien configurado resuelve en minutos.\n\n¿Qué tienen en común los equipos que escalan rápido?\n→ Deploys automáticos y auditables\n→ Tests que corren solos en cada PR\n→ Infraestructura como código, versionada y revisable\n→ Alertas que llegan antes de que el cliente reporte\n\nNo necesitas un equipo de 20 personas para tener esto. Lo necesitas desde el primer cliente de producción.\n\nEn Zayfy somos ese DevOps Partner que acompaña desde el comienzo. 🚀\n\n¿Tu equipo ya tiene CI/CD o todavía hace deploy a mano?\n\n#DevOps #CICD #InfraestructuraComoCodigó #Automatizacion #Zayfy`
+      ],
+      caso: [
+        `De deploys los viernes con miedo a deploys diarios sin drama. 🚀\n\nEso es lo que busca cualquier equipo de ingeniería serio.\n\nEl camino:\n1. Mapear el pipeline actual y sus puntos de dolor\n2. Implementar CI con tests automáticos\n3. IaC para infra reproducible\n4. CD con rollback automático\n5. Observabilidad desde el día 1\n\nNo es magia. Es proceso.\n\nEn Zayfy somos el partner técnico que lo diseña e implementa contigo.\n\n¿En qué paso está tu equipo?\n\n#DevOps #EngineeringCulture #Automatizacion #Zayfy`
+      ]
+    },
+    ai: {
+      awareness: [
+        `La IA no va a reemplazar a tu equipo. Pero el equipo que usa IA va a reemplazar al que no.\n\nEn Zayfy implementamos automatizaciones con IA que ya tienen impacto real:\n\n→ Asistentes de WhatsApp que atienden 500 conversaciones sin fatiga\n→ Pipelines que generan código, lo testean y abren PRs solos\n→ Sistemas que triangulan alertas y proponen causa raíz en minutos\n\nEl punto de partida no es un proyecto grande. Es un flujo concreto donde hoy hay trabajo manual repetitivo.\n\n¿Cuál es el tuyo?\n\n#AI #Automatizacion #AIDevOps #Zayfy #BeyondCode`
+      ]
+    },
+    cloud: {
+      tip: [
+        `5 señales de que tu infraestructura cloud está costando de más 👇\n\n1. Tienes instancias running que nadie sabe para qué son\n2. Los ambientes de staging y producción tienen el mismo tamaño\n3. No tienes alertas de costo, solo la factura mensual\n4. Los backups se hacen... cuando alguien se acuerda\n5. El auto-scaling nunca se configuró porque "después lo hacemos"\n\nSi reconoces 3 o más, es hora de un Cloud Rescue.\n\nEn Zayfy hacemos la revisión en 3 días. Informe claro. Los $300K se descuentan si contratas. 💜\n\n#AWS #CloudOptimization #FinOps #Zayfy #CloudRescue`
+      ]
+    },
+    emprendedor: {
+      awareness: [
+        `En Colombia hay más de 2 millones de negocios que venden por WhatsApp o TikTok sin una página web propia.\n\nNo es un problema de dinero. Es un problema de acceso a la solución correcta.\n\nEl Paquete Emprendedor de Zayfy nació para ese segmento:\n\n→ Tienda web en 3-7 días hábiles\n→ Integración con WhatsApp Business\n→ Cobros online desde el día 1\n→ Precios que un micronegocio puede pagar\n\n¿El mercado potencial? Enorme. ¿La solución? Ya existe.\n\n#EmprendimientoTech #MicroNegocios #Colombia #Zayfy`
+      ]
+    }
+  }
+};
+
+// Fallback universal
+function getFallback(net, svc, goal, audience, extra) {
+  const svcName = svcData[svc]?.name || 'Zayfy';
+  const audName = audienceNames[audience] || 'emprendedores';
+  const netName = networkNames[net];
+  const tags = svcData[svc]?.tags?.join(' ') || '#zayfy #tech';
+
+  const goalMap = {
+    awareness: `¿Todavía no conoces ${svcName} de Zayfy?\n\nSomos el aliado tech para ${audName} que quieren crecer sin complicarse.\n\nBeyond Code. Beyond Limits. 💜\n\nEscríbenos → zay-fy.com\n\n${tags} #zayfy #colombia`,
+    problem: `Los ${audName} pierden tiempo y ventas por no tener las herramientas correctas. 💡\n\nZayfy existe para cambiar eso.\n\n${svcName}: la solución que tu negocio necesita.\n\n¿Te pasa esto? Cuéntanos 👇\n\n${tags} #emprendimiento #negociodigital`,
+    solucion: `${svcName} de Zayfy: la solución pensada para ${audName}. 🚀\n\nRápida de implementar. Clara en resultados. Con soporte real.\n\nBeyond Code. Beyond Limits.\n\n📩 connect@zay-fy.com | WA +57 312 815 8689\n\n${tags}`,
+    caso: `Resultados reales con ${svcName} 📊\n\nNuestros clientes ${audName} logran:\n✅ Más ventas sin más trabajo manual\n✅ Procesos organizados desde el primer día\n✅ Tecnología que crece con ellos\n\n¿Tu negocio está listo?\n\n${tags} #casodeexito #zayfy`,
+    tip: `Consejo para ${audName} que quieren crecer online 💡\n\nNo necesitas una solución cara ni complicada.\nNecesitas la solución correcta para tu etapa.\n\nZayfy lo diseña contigo. 💜\n\n${tags} #consejo #negociodigital`,
+    cta: `¿Eres ${audName} y quieres dar el siguiente paso? 🚀\n\nEscríbenos hoy:\n📱 WA +57 312 815 8689\n🌐 zay-fy.com\n📧 connect@zay-fy.com\n\n${tags} #zayfy`
+  };
+  return goalMap[goal] || goalMap.awareness;
+}
+
+function getContent(net, svc, goal, audience, extra) {
+  try {
+    const pool = contentTemplates[net]?.[svc]?.[goal];
+    if (pool && pool.length > 0) {
+      let text = pool[Math.floor(Math.random() * pool.length)];
+      if (extra && extra.trim()) {
+        text = text + `\n\n📍 ${extra.trim()}`;
+      }
+      return text;
+    }
+  } catch(e) {}
+  return getFallback(net, svc, goal, audience, extra);
+}
+
+// ===== INIT FORMATS =====
+function initFormats() {
+  const fmts = formats[selectedNet] || [];
+  const container = document.getElementById('format-chips');
+  container.innerHTML = '';
+  fmts.forEach((f, i) => {
+    const chip = document.createElement('button');
+    chip.className = 'chip' + (i === 0 ? ' active' : '');
+    chip.textContent = f;
+    chip.onclick = () => {
+      container.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+      selectedFormat = f;
+    };
+    container.appendChild(chip);
+    if (i === 0) selectedFormat = f;
+  });
+}
+
+// ===== SELECT NET =====
+function selectNet(btn) {
+  document.querySelectorAll('.net-btn').forEach(b => {
+    b.className = 'net-btn';
+  });
+  selectedNet = btn.dataset.net;
+  btn.className = `net-btn active-${selectedNet}`;
+  initFormats();
+}
+
+// ===== SELECT SVC =====
+function selectSvc(btn) {
+  document.querySelectorAll('.service-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  selectedSvc = btn.dataset.svc;
+}
+
+// ===== GENERATE =====
+function generateContent() {
+  const btn = document.getElementById('gen-btn');
+  const audience = document.getElementById('audience').value;
+  const goal = document.getElementById('goal').value;
+  const extra = document.getElementById('extra-context').value;
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>';
+
+  setTimeout(() => {
+    const main = getContent(selectedNet, selectedSvc, goal, audience, extra);
+
+    // Generar 2 variaciones adicionales
+    const v2 = getContent(selectedNet, selectedSvc, goal === 'awareness' ? 'problem' : 'awareness', audience, extra);
+    const v3 = getContent(selectedNet, selectedSvc, goal === 'cta' ? 'solucion' : 'cta', audience, extra);
+
+    const outputCard = document.getElementById('output-card');
+    const outputBox = document.getElementById('output-box');
+    const outputTitle = document.getElementById('output-title');
+    const variationsContainer = document.getElementById('variations-container');
+
+    outputCard.style.display = 'block';
+    outputBox.className = 'output-box';
+    outputBox.textContent = main;
+    outputTitle.textContent = `${networkIcons[selectedNet]} ${networkNames[selectedNet]} · ${svcData[selectedSvc].name}`;
+
+    variationsContainer.innerHTML = '';
+    if (v2 !== main) {
+      variationsContainer.appendChild(createVariationCard('Variación alternativa', v2));
+    }
+    if (v3 !== main && v3 !== v2) {
+      variationsContainer.appendChild(createVariationCard('Versión con CTA', v3));
+    }
+
+    btn.disabled = false;
+    btn.innerHTML = '✦ Generar contenido';
+    outputCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }, 600);
+}
+
+function createVariationCard(label, text) {
+  const card = document.createElement('div');
+  card.className = 'variation-card';
+  card.innerHTML = `
+    <div class="variation-label">${label}</div>
+    <div class="variation-text">${text}</div>
+    <button class="copy-var" onclick="copyText(this, event)">Copiar</button>
+  `;
+  return card;
+}
+
+function copyText(btn, e) {
+  e.stopPropagation();
+  const text = btn.previousElementSibling.textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = '✓ Copiado';
+    setTimeout(() => btn.textContent = 'Copiar', 2000);
+  }).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = text; document.body.appendChild(ta);
+    ta.select(); document.execCommand('copy');
+    document.body.removeChild(ta);
+    btn.textContent = '✓ Copiado';
+    setTimeout(() => btn.textContent = 'Copiar', 2000);
+  });
+}
+
+function copyOutput() {
+  const text = document.getElementById('output-box').textContent;
+  const btn = document.getElementById('copy-btn');
+  navigator.clipboard.writeText(text).then(() => {
+    btn.classList.add('copied');
+    btn.textContent = '✓ Copiado';
+    setTimeout(() => { btn.classList.remove('copied'); btn.innerHTML = '📋 Copiar'; }, 2000);
+  }).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = text; document.body.appendChild(ta);
+    ta.select(); document.execCommand('copy');
+    document.body.removeChild(ta);
+    showToast('Copiado al portapapeles');
+  });
+}
+
+function regenerate() { generateContent(); }
+
+function saveToLeads() {
+  const text = document.getElementById('output-box').textContent;
+  try {
+    savedIdeas.push({ text, net: selectedNet, svc: selectedSvc, date: new Date().toLocaleDateString('es-CO') });
+    localStorage.setItem('zayfy_ideas', JSON.stringify(savedIdeas));
+  } catch(e) {}
+  showToast('💜 Idea guardada');
+}
+
+// ===== IDEAS TAB =====
+const ideasData = [
+  {
+    svc: 'Paquete Emprendedor',
+    emoji: '🛍️',
+    items: [
+      { icon: '📸', title: 'Antes y después: DM caótico vs. tienda organizada', hint: 'IG carrusel / TikTok video', nets: ['ig','tk'] },
+      { icon: '⏱️', title: '"Tu tienda en 3 días" — time-lapse del proceso', hint: 'TikTok / Reel de IG', nets: ['ig','tk'] },
+      { icon: '💬', title: 'POV: Cliente que no compró porque no había link de pago', hint: 'TikTok story / Reel', nets: ['tk'] },
+      { icon: '📊', title: '¿Cuánto pierdes por semana sin tienda propia?', hint: 'LinkedIn + IG carrusel', nets: ['ig','li'] },
+      { icon: '🎯', title: '"Míralo antes de pagar" — demo en vivo de una tienda', hint: 'TikTok / Story IG', nets: ['ig','tk'] },
+      { icon: '🤝', title: 'El proceso paso a paso de trabajar con Zayfy', hint: 'IG carrusel / LinkedIn', nets: ['ig','li'] }
+    ]
+  },
+  {
+    svc: 'AI & Automation',
+    emoji: '🤖',
+    items: [
+      { icon: '🌙', title: '"Tu WhatsApp vendiendo mientras duermes"', hint: 'TikTok / Reel viral', nets: ['ig','tk'] },
+      { icon: '📱', title: 'Demo real de asistente IA respondiendo preguntas', hint: 'TikTok / Story IG', nets: ['ig','tk'] },
+      { icon: '💡', title: '5 cosas que tu asistente de IA puede hacer hoy', hint: 'LinkedIn artículo / IG carrusel', nets: ['ig','li'] },
+      { icon: '🔄', title: 'El flujo completo: mensaje → pedido → cobro → confirmación', hint: 'TikTok animado / LinkedIn', nets: ['tk','li'] }
+    ]
+  },
+  {
+    svc: 'DevOps Partner',
+    emoji: '⚙️',
+    items: [
+      { icon: '😰', title: '"El deploy del viernes" — cultura vs. pipeline automático', hint: 'LinkedIn reflexión', nets: ['li'] },
+      { icon: '📈', title: 'Qué pasa en 90 días con un pipeline de CI/CD real', hint: 'LinkedIn / IG carrusel', nets: ['ig','li'] },
+      { icon: '🔧', title: '5 señales de que tu DevOps está desactualizado', hint: 'LinkedIn + IG', nets: ['ig','li'] }
+    ]
+  },
+  {
+    svc: 'Cloud Rescue',
+    emoji: '☁️',
+    items: [
+      { icon: '💸', title: '5 señales de que tu cloud está costando de más', hint: 'LinkedIn / IG carrusel', nets: ['ig','li'] },
+      { icon: '🚨', title: '"El día que el servidor se cayó a las 2am"', hint: 'TikTok / LinkedIn historia', nets: ['tk','li'] },
+      { icon: '📋', title: 'Qué incluye un Cloud Rescue de $300.000', hint: 'IG + LinkedIn', nets: ['ig','li'] }
+    ]
+  }
+];
+
+function renderIdeas() {
+  const container = document.getElementById('ideas-list');
+  container.innerHTML = '';
+  ideasData.forEach(cat => {
+    const section = document.createElement('div');
+    section.innerHTML = `<div class="idea-category">${cat.emoji} ${cat.svc}</div>`;
+    const list = document.createElement('div');
+    list.className = 'idea-list';
+    cat.items.forEach(item => {
+      const div = document.createElement('div');
+      div.className = 'idea-item';
+      const badges = item.nets.map(n =>
+        `<span class="net-badge badge-${n}">${networkNames[n]}</span>`
+      ).join('');
+      div.innerHTML = `
+        <span class="idea-icon">${item.icon}</span>
+        <div class="idea-content">
+          <div class="idea-title">${item.title}${badges}</div>
+          <div class="idea-hint">${item.hint}</div>
+        </div>
+      `;
+      div.onclick = () => {
+        // Precarga en generador
+        const svcMap = { 'Paquete Emprendedor': 'emprendedor', 'AI & Automation': 'ai', 'DevOps Partner': 'devops', 'Cloud Rescue': 'cloud' };
+        const svcKey = svcMap[cat.svc];
+        if (svcKey) {
+          document.querySelector(`[data-svc="${svcKey}"]`)?.click();
+        }
+        const net = item.nets[0];
+        document.querySelector(`[data-net="${net}"]`)?.click();
+        document.getElementById('extra-context').value = item.title;
+        showTab('generator', document.querySelector('.nav-item'));
+        document.querySelectorAll('.nav-item').forEach((el, i) => {
+          if (i === 0) el.classList.add('active'); else el.classList.remove('active');
+        });
+        showToast('💜 Idea cargada en el generador');
+      };
+      list.appendChild(div);
+    });
+    section.appendChild(list);
+    container.appendChild(section);
+  });
+}
+
+// ===== HASHTAGS TAB =====
+const hashtagGroups = [
+  {
+    label: 'Micronegocios Colombia', emoji: '🛍️',
+    tags: ['#tiendaonline', '#negocioscolombia', '#emprendimientocol', '#vendoporinsta', '#tiendalinea', '#negociodigital', '#venderporinternet', '#emprendedorcol', '#tiendavirtual', '#crecimientonegocio']
+  },
+  {
+    label: 'TikTok Sellers', emoji: '🎵',
+    tags: ['#tiktokshop', '#vendoporinsta', '#tiktokbusiness', '#tiktokcolombia', '#emprendedortiktok', '#negociotiktok', '#crecimientotiktok', '#tiendatiktok']
+  },
+  {
+    label: 'Tecnología & Dev', emoji: '⚙️',
+    tags: ['#devops', '#cicd', '#aws', '#cloud', '#infraestructura', '#automatizacion', '#devsecops', '#cloudnative', '#sre', '#observabilidad']
+  },
+  {
+    label: 'IA & Automatización', emoji: '🤖',
+    tags: ['#ia', '#inteligenciaartificial', '#automatizacion', '#chatbot', '#whatsappbusiness', '#nlp', '#llm', '#agenteoia', '#aidevops', '#mlops']
+  },
+  {
+    label: 'Nicho Belleza', emoji: '💅',
+    tags: ['#salon', '#beautybusiness', '#negociosbelleza', '#peluqueria', '#estilista', '#salondebeleza', '#beautysalon', '#salonbelleza']
+  },
+  {
+    label: 'LinkedIn Tech', emoji: '💼',
+    tags: ['#DevOps', '#SoftwareDevelopment', '#CloudComputing', '#AIAutomation', '#TechStartup', '#DigitalTransformation', '#EngineeringLeader', '#Zayfy', '#BeyondCode']
+  }
+];
+
+function renderHashtags() {
+  const container = document.getElementById('hashtag-content');
+  container.innerHTML = '';
+  hashtagGroups.forEach(group => {
+    const div = document.createElement('div');
+    div.className = 'hashtag-category';
+    div.innerHTML = `<div class="idea-category">${group.emoji} ${group.label}</div>`;
+    const list = document.createElement('div');
+    list.className = 'hashtag-list';
+    group.tags.forEach(tag => {
+      const pill = document.createElement('button');
+      pill.className = 'hashtag-pill';
+      pill.textContent = tag;
+      pill.onclick = () => {
+        navigator.clipboard.writeText(tag).then(() => {
+          pill.classList.add('copied-ht');
+          setTimeout(() => pill.classList.remove('copied-ht'), 1500);
+        }).catch(() => showToast(tag + ' — copialo manualmente'));
+      };
+      list.appendChild(pill);
+    });
+    div.appendChild(list);
+    container.appendChild(div);
+  });
+}
+
+// ===== LEADS TAB =====
+const avatarColors = ['#6e56ff', '#00d4a0', '#ff2d55', '#f59e0b', '#0a66c2', '#e1306c'];
+function getColor(str) { let h = 0; for (let c of str) h = (h * 31 + c.charCodeAt(0)) % avatarColors.length; return avatarColors[h]; }
+
+function renderLeads() {
+  const list = document.getElementById('lead-list');
+  if (leads.length === 0) {
+    list.innerHTML = '<div class="empty-leads">Aún no hay leads. Agrega cuentas potenciales para hacer seguimiento. 📋</div>';
+    return;
+  }
+  list.innerHTML = '';
+  leads.forEach((lead, i) => {
+    const card = document.createElement('div');
+    card.className = 'lead-card';
+    const color = getColor(lead.handle);
+    const initial = lead.handle.replace('@','')[0]?.toUpperCase() || '?';
+    const netBadgeClass = `badge-${lead.net || 'ig'}`;
+    const statusClasses = { 'Nuevo': 'status-nuevo', 'Contactado': 'status-contactado', 'Seguimiento': 'status-seguimiento' };
+    const statusClass = statusClasses[lead.status] || 'status-nuevo';
+    card.innerHTML = `
+      <div class="lead-avatar" style="background:${color}20; color:${color};">${initial}</div>
+      <div class="lead-info">
+        <div class="lead-handle">${lead.handle} <span class="net-badge ${netBadgeClass}">${networkNames[lead.net] || 'IG'}</span></div>
+        <div class="lead-meta">${lead.niche} · ${lead.date}</div>
+      </div>
+      <select class="form-select" style="max-width:130px; font-size:12px; padding:5px 8px;" onchange="updateLeadStatus(${i}, this.value)">
+        <option ${lead.status==='Nuevo'?'selected':''}>Nuevo</option>
+        <option ${lead.status==='Contactado'?'selected':''}>Contactado</option>
+        <option ${lead.status==='Seguimiento'?'selected':''}>Seguimiento</option>
+      </select>
+      <span class="lead-status ${statusClass}">${lead.status || 'Nuevo'}</span>
+      <button class="lead-delete" onclick="deleteLead(${i})" title="Eliminar">×</button>
+    `;
+    list.appendChild(card);
+  });
+}
+
+function addLead() {
+  const handle = document.getElementById('lead-handle').value.trim();
+  if (!handle) { showToast('Ingresa un @handle o nombre'); return; }
+  leads.push({
+    handle: handle.startsWith('@') ? handle : '@' + handle,
+    net: document.getElementById('lead-net').value,
+    niche: document.getElementById('lead-niche').value,
+    status: 'Nuevo',
+    date: new Date().toLocaleDateString('es-CO')
+  });
+  try { localStorage.setItem('zayfy_leads', JSON.stringify(leads)); } catch(e) {}
+  document.getElementById('lead-handle').value = '';
+  renderLeads();
+  showToast('💜 Lead agregado');
+}
+
+function updateLeadStatus(i, status) {
+  leads[i].status = status;
+  try { localStorage.setItem('zayfy_leads', JSON.stringify(leads)); } catch(e) {}
+  renderLeads();
+}
+
+function deleteLead(i) {
+  leads.splice(i, 1);
+  try { localStorage.setItem('zayfy_leads', JSON.stringify(leads)); } catch(e) {}
+  renderLeads();
+}
+
+// ===== TAB NAVIGATION =====
+function showTab(tabId, navItem) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + tabId)?.classList.add('active');
+  if (navItem) {
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    navItem.classList.add('active');
+  }
+}
+
+// ===== TOAST =====
+function showToast(msg) {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 2200);
+}
+
+// ===== THEME =====
+function toggleTheme() {
+  const root = document.documentElement;
+  const current = root.getAttribute('data-theme');
+  root.setAttribute('data-theme', current === 'light' ? 'dark' : 'light');
+}
+
+// ===== INIT =====
+initFormats();
+renderIdeas();
+renderHashtags();
+renderLeads();
+</script>
+</body>
+</html>
