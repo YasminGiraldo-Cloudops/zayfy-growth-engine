@@ -54,7 +54,7 @@ Pipeline automatizado que monitorea hashtags en IG/TikTok, califica leads con Cl
 
 ## Bitácora del programa
 
-[`bitacora-devops-zayfy.html`](bitacora-devops-zayfy.html) — 8 módulos + Consolidado con evidencia del proceso.
+[`bitacora-devops-zayfy.html`](bitacora-devops-zayfy.html) — registro de los 8 módulos del programa AI-Driven DevOps Accelerator: reflexiones, decisiones técnicas tomadas para Zayfy Growth Engine, lecciones aprendidas y evidencias del proceso (código, CI verde, artefactos publicados).
 
 ---
 
